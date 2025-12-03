@@ -28,4 +28,11 @@ class VendorProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function vendorDocuments()
+{
+    return $this->hasMany(VendorDocument::class, 'vendor_profile_id');
+}
+
+
+
 }

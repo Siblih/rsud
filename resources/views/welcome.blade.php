@@ -9,21 +9,22 @@
 <body class="bg-gradient-to-br from-blue-50 to-gray-100 flex items-center justify-center min-h-screen">
 
     <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-8 text-center">
-        <!-- Logo -->
-        <div class="flex flex-col items-center mb-4">
-            <img src="{{ asset('images/rsud.png') }}" alt="Logo KOYAMI" class="w-20 h-20 mb-2">
-            <h1 class="text-xl font-bold text-gray-800">PERSUD</h1>
-            <p class="text-sm text-gray-500">Pengadaan RSUD BANGIL</p>
+        
+        <!-- Logo Ganda -->
+        <div class="flex items-center justify-center space-x-6 mb-4">
+            <img src="{{ asset('images/rsud.png') }}" alt="Logo RSUD" class="w-20 h-20">
+            <img src="{{ asset('images/pasuruan.png') }}" alt="Logo PERSUD" class="w-20 h-20">
         </div>
+
+        <!-- Judul -->
+        <h1 class="text-2xl font-bold text-gray-800">PERSUD</h1>
+        <p class="text-sm text-gray-500 mb-4">Pengadaan RSUD BANGIL</p>
 
         <hr class="my-4">
 
         <!-- Teks Sambutan -->
         <h2 class="text-2xl font-bold text-gray-800 mb-1">Selamat Datang di PERSUD</h2>
-        <p class="text-sm text-gray-500 mb-6">Pengadaan RSUD BANGIL</p>
-        <p class="text-gray-600 text-sm mb-8">
-            Aplikasi Management Pengadaan RSUD BANGIL
-        </p>
+        <p class="text-sm text-gray-500 mb-6">Aplikasi Manajemen Pengadaan RSUD BANGIL</p>
 
         <!-- Tombol -->
         <div class="flex flex-col space-y-3">
@@ -48,16 +49,16 @@
         </div>
 
         <!-- Footer -->
-    <footer class="mt-6 text-sm text-gray-500">
-        © 2025 PERSUD. Dibuat oleh 
-        <a href="https://siblih.rf.gd" 
-           class="text-blue-600 hover:text-blue-800 font-medium" 
-           target="_blank" 
-           rel="noopener noreferrer">
-           SIBLIH
-        </a>.
-        Hak cipta dilindungi.
-    </footer>
+        <footer class="mt-6 text-sm text-gray-500">
+            © 2025 PERSUD. Dibuat oleh 
+            <a href="https://siblih.rf.gd" 
+               class="text-blue-600 hover:text-blue-800 font-medium" 
+               target="_blank" 
+               rel="noopener noreferrer">
+               SIBLIH
+            </a>.
+            Hak cipta dilindungi.
+        </footer>
 
     </div>
 

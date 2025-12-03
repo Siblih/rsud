@@ -10,7 +10,11 @@
 
   <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
     <div class="text-center mb-6">
-      <img src="{{ asset('images/rsud.png') }}" alt="Logo" class="mx-auto w-16 mb-2">
+      <!-- Logo Ganda -->
+        <div class="flex items-center justify-center space-x-6 mb-4">
+            <img src="{{ asset('images/rsud.png') }}" alt="Logo RSUD" class="w-20 h-20">
+            <img src="{{ asset('images/pasuruan.png') }}" alt="Logo PERSUD" class="w-20 h-20">
+        </div>
       <h2 class="text-2xl font-semibold text-gray-800">PERSUD</h2>
       <p class="text-gray-500 text-sm">Pengadaan RSUD BANGIL</p>
     </div>

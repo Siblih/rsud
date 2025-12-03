@@ -18,10 +18,13 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    'name',
+    'email',
+    'password',
+    'role',      // tambahkan ini
+    'unit_id',   // juga tambahkan supaya unit user bisa diassign
+];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -45,4 +48,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function unit()
+{
+    return $this->belongsTo(Unit::class);
+}
+// app/Models/User.php
+public function vendorProfile()
+{
+    return $this->hasOne(VendorProfile::class, 'user_id');
+}
+
+public function vendorDocuments()
+{
+    return $this->hasManyThrough(
+        VendorDocument::class,
+        VendorProfile::class,
+        'user_id',           // foreign key di vendor_profiles
+        'vendor_profile_id', // foreign key di vendor_documents
+        'id',                // primary key di users
+        'id'                 // primary key di vendor_profiles
+    );
+}
+
+public function penawarans()
+{
+    return $this->hasMany(Penawaran::class, 'vendor_id');
+}
+
 }
