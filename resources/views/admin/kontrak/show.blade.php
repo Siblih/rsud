@@ -110,13 +110,62 @@
             </div>
 
         </div>
-{{-- BUAT PO --}}
-<div class="mt-10">
-    <a href="{{ route('admin.po.create', $kontrak->id) }}"
-       class="px-5 py-3 bg-green-600 hover:bg-green-700 rounded-lg shadow-md transition font-semibold">
-        ➕ Buat Purchase Order
-    </a>
+{{-- BUAT PO (lebih lengkap & kondisional) --}}
+@php
+    // ambil PO terkait (pastikan $kontrak->purchaseOrders() terdefinisi di model)
+    $poCount = $kontrak->purchaseOrders()->count();
+    $lastPo = $kontrak->purchaseOrders()->latest()->first();
+@endphp
+
+<div class="mt-8 space-y-3">
+    {{-- Info singkat --}}
+    <div class="bg-white/5 p-3 rounded-lg border border-white/10 text-sm text-gray-300">
+        <strong>PO terkait:</strong>
+        <span class="ml-2 {{ $poCount ? 'text-yellow-200' : 'text-gray-400' }}">
+            {{ $poCount }} PO ditemukan
+            @if($lastPo)
+                — terakhir: <span class="font-medium">{{ $lastPo->nomor_po }}</span>
+            @endif
+        </span>
+    </div>
+
+    <div class="flex items-center gap-3">
+        {{-- Jika kontrak aktif, tampilkan tombol Buat PO --}}
+        @if($kontrak->status === 'aktif')
+            <a href="{{ route('admin.po.create', $kontrak->id) }}"
+               class="px-5 py-3 bg-green-600 hover:bg-green-700 rounded-lg shadow-md transition font-semibold">
+                ➕ Buat Purchase Order
+            </a>
+        @else
+            <button disabled
+                    title="Kontrak bukan status aktif — tidak bisa membuat PO"
+                    class="px-5 py-3 bg-gray-600 rounded-lg shadow-md text-gray-200 cursor-not-allowed">
+                ➕ Buat Purchase Order
+            </button>
+        @endif
+
+        {{-- Jika sudah ada PO, tambahkan link untuk lihat daftar PO kontrak ini --}}
+        @if($poCount)
+            <a href="{{ url('/admin/pengadaan?tab=po&kontrak_id='.$kontrak->id) }}"
+               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition text-sm">
+                📄 Lihat PO ({{ $poCount }})
+            </a>
+
+            {{-- Opsional: buat PO revisi (jika system mengizinkan) --}}
+            <a href="{{ route('admin.po.create', $kontrak->id) }}?revisi=1"
+               class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-lg shadow-md transition text-sm">
+                🔁 Buat PO Revisi
+            </a>
+        @endif
+    </div>
+
+    {{-- Catatan / petunjuk --}}
+    <p class="text-xs text-gray-400 mt-2">
+        Tip: Setelah membuat PO, sistem akan mengarahkan ke halaman edit PO untuk menambahkan item & harga.  
+        Setelah lengkap, klik "Generate PDF" untuk membuat dokumen PO yang bisa dikirim ke vendor.
+    </p>
 </div>
+
 
         {{-- BUTTON KEMBALI --}}
        <div class="mt-10 text-right">

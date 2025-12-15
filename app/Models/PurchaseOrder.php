@@ -13,7 +13,9 @@ class PurchaseOrder extends Model
         'tanggal_po',
         'total',
         'file_po',
-        'status'
+        'status',
+        'signed_by_vendor', 'signed_at', 'vendor_signature', 'vendor_signed_pdf'
+
     ];
 
     public function kontrak()

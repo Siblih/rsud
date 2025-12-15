@@ -17,6 +17,8 @@ use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Admin\KontrakController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
+use App\Http\Controllers\Vendor\VendorPurchaseOrderController;
+
 
 
 
@@ -131,17 +133,32 @@ Route::get('/kontrak', [KontrakController::class, 'index'])->name('kontrak.index
         Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
         Route::get('/log', [LogController::class, 'index'])->name('log');
         Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
-        // PURCHASE ORDER
-Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
-Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
-Route::get('/po/create/{kontrak}', [PurchaseOrderController::class, 'create'])
-    ->name('po.create');
+      // ======================
+// PURCHASE ORDER (ADMIN)
+// ======================
+Route::prefix('po')->name('po.')->group(function () {
 
-Route::post('/po/store/{kontrak_id}', [PurchaseOrderController::class, 'store'])
-    ->name('po.store');
+    // List semua PO
+    Route::get('/', [PurchaseOrderController::class, 'index'])->name('index');
 
-Route::get('/po/{id}/edit', [PurchaseOrderController::class, 'edit'])
-    ->name('po.edit');
+    // Form create PO berdasarkan kontrak
+    Route::get('/create/{kontrak_id}', [PurchaseOrderController::class, 'create'])->name('create');
+
+    // Simpan PO baru
+    Route::post('/store/{kontrak_id}', [PurchaseOrderController::class, 'store'])->name('store');
+
+    // Detail PO
+    Route::get('/{id}', [PurchaseOrderController::class, 'show'])->name('show');
+
+    // Edit PO
+    Route::get('/{id}/edit', [PurchaseOrderController::class, 'edit'])->name('edit');
+
+    // Update PO
+    Route::put('/{id}', [PurchaseOrderController::class, 'update'])->name('update');
+});
+Route::get('/po/{id}/generate-pdf', [PurchaseOrderController::class, 'generatePdf'])->name('po.generatePdf');
+Route::post('/po/{id}/generate-signed-pdf', [PurchaseOrderController::class, 'generateSignedPdf'])->name('po.generateSignedPdf');
+
 
     });
 
@@ -206,7 +223,10 @@ Route::post('/vendor/kontrak/{id}/upload', [KontrakController::class, 'upload'])
 
 
 
-    
+    Route::get('/vendor/po', [VendorPurchaseOrderController::class, 'index'])->name('vendor.po.index');
+Route::get('/vendor/po/{id}', [VendorPurchaseOrderController::class, 'show'])->name('vendor.po.show');
+Route::post('/vendor/po/{id}/sign', [VendorPurchaseOrderController::class, 'sign'])->name('vendor.po.sign');
+
 
 
     // 🔔 Notifikasi
