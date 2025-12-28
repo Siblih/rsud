@@ -57,6 +57,23 @@
                                        class="w-full p-2 rounded text-black" required>
                             </div>
                         </div>
+                        <div class="mb-2">
+    <label class="block text-sm">Spesifikasi Teknis</label>
+    <input type="text"
+        name="items[{{ $index }}][spesifikasi]"
+        value="{{ $item->spesifikasi }}"
+        class="w-full p-2 rounded text-black">
+</div>
+
+<div>
+    <label class="block text-sm">Satuan</label>
+    <input type="text"
+        name="items[{{ $index }}][satuan]"
+        value="{{ $item->satuan }}"
+        class="w-full p-2 rounded text-black">
+</div>
+
+
 
                         <button type="button"
                                 class="absolute top-2 right-2 text-red-300 hover:text-red-500 remove-item">
@@ -66,31 +83,52 @@
                 @endforeach
 
             </div>
+{{-- RINGKASAN & AKSI --}}
+<hr class="my-6 border-gray-400/30">
 
-            {{-- BUTTON TAMBAH ITEM --}}
-            <button type="button"
-                    id="add-item"
-                    class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">
-                ➕ Tambah Item
-            </button>
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-
-            <hr class="my-6 border-gray-400/30">
-
-            {{-- SUBMIT --}}
-            <button type="submit"
-                    class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-semibold">
-                💾 Simpan Perubahan
-            </button>
-
-            <a href="{{ route('admin.po.show', $po->id) }}"
-               class="ml-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg">
-                ⬅ Kembali
-            </a>
-
-        </form>
-
+    {{-- KIRI: TAMBAH ITEM --}}
+    <div>
+        <button type="button"
+                id="add-item"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg shadow">
+            ➕ Tambah Item
+        </button>
     </div>
+
+    {{-- KANAN: TOTAL + PDF --}}
+    <div class="text-right space-y-2">
+        <div class="text-lg font-bold">
+            Total:
+            Rp {{ number_format($po->items->sum(fn($i) => $i->qty * $i->harga), 0, ',', '.') }}
+        </div>
+
+        @if($po->items->count() > 0)
+            <a href="{{ route('admin.po.generate-pdf', $po->id) }}"
+               class="inline-block px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg shadow">
+                📄 Generate PDF PO
+            </a>
+        @endif
+    </div>
+
+</div>
+
+<hr class="my-6 border-gray-400/30">
+
+{{-- AKSI UTAMA --}}
+<div class="flex justify-end gap-3">
+    <a href="{{ route('admin.po.show', $po->id) }}"
+       class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg">
+        ⬅ Kembali
+    </a>
+
+    <button type="submit"
+            class="px-5 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-semibold shadow">
+        💾 Simpan Perubahan
+    </button>
+</div>
+
 </div>
 
 {{-- JavaScript --}}
@@ -100,31 +138,53 @@ let itemIndex = {{ count($po->items) }};
 document.getElementById('add-item').addEventListener('click', function() {
     const wrapper = document.getElementById('items-wrapper');
 
-    const html = `
-        <div class="bg-white/10 p-4 rounded-xl relative item-row">
+   const html = `
+<div class="bg-white/10 p-4 rounded-xl relative item-row">
 
-            <div class="mb-2">
-                <label class="block text-sm">Nama Item</label>
-                <input type="text" name="items[${itemIndex}][nama_item]" class="w-full p-2 rounded text-black" required>
-            </div>
+    <div class="mb-2">
+        <label class="block text-sm">Nama Item</label>
+        <input type="text"
+            name="items[${itemIndex}][nama_item]"
+            class="w-full p-2 rounded text-black" required>
+    </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-sm">Qty</label>
-                    <input type="number" name="items[${itemIndex}][qty]" class="w-full p-2 rounded text-black" required>
-                </div>
-                <div>
-                    <label class="block text-sm">Harga</label>
-                    <input type="number" name="items[${itemIndex}][harga]" class="w-full p-2 rounded text-black" required>
-                </div>
-            </div>
+    <div class="mb-2">
+        <label class="block text-sm">Spesifikasi Teknis</label>
+        <input type="text"
+            name="items[${itemIndex}][spesifikasi]"
+            class="w-full p-2 rounded text-black">
+    </div>
 
-            <button type="button"
-                    class="absolute top-2 right-2 text-red-300 hover:text-red-500 remove-item">
-                ✖
-            </button>
+    <div class="grid grid-cols-3 gap-3">
+        <div>
+            <label class="block text-sm">Qty</label>
+            <input type="number"
+                name="items[${itemIndex}][qty]"
+                class="w-full p-2 rounded text-black" required>
         </div>
-    `;
+
+        <div>
+            <label class="block text-sm">Satuan</label>
+            <input type="text"
+                name="items[${itemIndex}][satuan]"
+                class="w-full p-2 rounded text-black">
+        </div>
+
+        <div>
+            <label class="block text-sm">Harga</label>
+            <input type="number"
+                name="items[${itemIndex}][harga]"
+                class="w-full p-2 rounded text-black" required>
+        </div>
+    </div>
+
+    <button type="button"
+        class="absolute top-2 right-2 text-red-300 hover:text-red-500 remove-item">
+        ✖
+    </button>
+</div>
+`;
+
 
     wrapper.insertAdjacentHTML('beforeend', html);
     itemIndex++;
@@ -136,6 +196,7 @@ document.addEventListener('click', function(e) {
         e.target.closest('.item-row').remove();
     }
 });
+
 </script>
 
 @endsection

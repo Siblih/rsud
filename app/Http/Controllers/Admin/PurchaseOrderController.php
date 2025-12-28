@@ -29,11 +29,17 @@ class PurchaseOrderController extends Controller
 
     // Create PO
     public function create($kontrak_id)
-    {
-        $kontrak = Kontrak::findOrFail($kontrak_id);
-        $nomorPO = 'PO-' . str_pad(PurchaseOrder::count() + 1, 4, '0', STR_PAD_LEFT);
-        return view('admin.po.create', compact('kontrak','nomorPO'));
+{
+    $kontrak = Kontrak::findOrFail($kontrak_id);
+
+    if ($kontrak->status != 'aktif') {
+        return redirect()->back()->withErrors('PO hanya bisa dibuat dari kontrak aktif.');
     }
+
+    $nomorPO = 'PO-' . str_pad(PurchaseOrder::count() + 1, 4, '0', STR_PAD_LEFT);
+    return view('admin.po.create', compact('kontrak','nomorPO'));
+}
+
 
     // Store PO + items + generate PDF otomatis
     // Store PO + items + generate PDF
@@ -41,59 +47,26 @@ public function store(Request $request, $kontrak_id)
 {
     $kontrak = Kontrak::findOrFail($kontrak_id);
 
-    // Validasi
     $request->validate([
         'tanggal_po' => 'required|date',
-        'items' => 'required|array|min:1',
-        'items.*.nama_item' => 'required|string',
-        'items.*.qty' => 'required|numeric|min:1',
-        'items.*.harga' => 'required|numeric|min:0',
     ]);
 
-    // Nomor PO otomatis
     $nomorPO = 'PO-' . str_pad(PurchaseOrder::count() + 1, 4, '0', STR_PAD_LEFT);
 
-    // Simpan PO
     $po = PurchaseOrder::create([
-        'nomor_po' => $nomorPO,
+        'nomor_po'   => $nomorPO,
         'kontrak_id' => $kontrak->id,
-        'vendor_id' => $kontrak->vendor_id,
+        'vendor_id'  => $kontrak->vendor_id,
         'tanggal_po' => $request->tanggal_po,
-        'status' => 'pending',
+        'status'     => 'draft', // ⬅️ penting
+        'total'      => 0,
     ]);
 
-    // Simpan items
-    $total = 0;
-    foreach ($request->items as $item) {
-        $poItem = PoItem::create([
-            'po_id' => $po->id,
-            'nama_item' => $item['nama_item'],
-            'spesifikasi' => $item['spesifikasi'] ?? null,
-            'qty' => (int)$item['qty'],
-            'harga' => (float)$item['harga'],
-            'total' => (int)$item['qty'] * (float)$item['harga'],
-        ]);
-        $total += $poItem->total;
-    }
-
-    // Update total PO
-    $po->total = $total;
-    $po->save();
-
-    // 🔹 Load relasi sebelum generate PDF
-    $po = PurchaseOrder::with(['items','vendor','kontrak'])->find($po->id);
-
-    // Generate PDF
-    $pdf = PDF::loadView('pdf.po', compact('po'))->setPaper('a4', 'portrait');
-    $fileName = 'po/PO-'.$po->nomor_po.'.pdf';
-    Storage::disk('public')->put($fileName, $pdf->output());
-
-    $po->file_pdf = $fileName;
-    $po->save();
-
-    return redirect()->route('admin.po.show', $po->id)
-                     ->with('success', 'PO berhasil dibuat dan PDF otomatis digenerate.');
+    return redirect()
+        ->route('admin.po.edit', $po->id)
+        ->with('success', 'PO berhasil dibuat, silakan isi item');
 }
+
 
 
     // Edit PO
@@ -104,75 +77,98 @@ public function store(Request $request, $kontrak_id)
     }
 
     // Update PO + items
-    public function update(Request $request, $id)
-    {
-        $po = PurchaseOrder::with('items')->findOrFail($id);
+   public function update(Request $request, $id)
+{
+    $po = PurchaseOrder::with('items')->findOrFail($id);
 
-        $request->validate([
-            'tanggal_po' => 'required|date',
-            'items' => 'required|array|min:1',
-        ]);
+    $request->validate([
+        'tanggal_po' => 'required|date',
+        'items' => 'required|array|min:1',
+        'items.*.nama_item' => 'required|string',
+        'items.*.qty' => 'required|numeric|min:1',
+        'items.*.harga' => 'required|numeric|min:0',
+        'items.*.spesifikasi' => 'nullable|string',
+    'items.*.satuan' => 'nullable|string',
+    ]);
 
-        $po->tanggal_po = $request->tanggal_po;
-        $po->save();
+    $po->update([
+        'tanggal_po' => $request->tanggal_po,
+    ]);
 
-        $total = 0;
-        foreach($request->items as $item){
-            if(!empty($item['id'])){
-                $pitem = PoItem::find($item['id']);
-                if($pitem){
-                    $pitem->nama_item = $item['nama_item'];
-                    $pitem->spesifikasi = $item['spesifikasi'] ?? null;
-                    $pitem->qty = (int)$item['qty'];
-                    $pitem->harga = (float)$item['harga'];
-                    $pitem->total = $pitem->qty * $pitem->harga;
-                    $pitem->save();
-                    $total += $pitem->total;
-                }
-            } else {
-                $pitem = PoItem::create([
-                    'po_id' => $po->id,
-                    'nama_item' => $item['nama_item'],
-                    'spesifikasi' => $item['spesifikasi'] ?? null,
-                    'qty' => (int)$item['qty'],
-                    'harga' => (float)$item['harga'],
-                    'total' => (int)$item['qty'] * (float)$item['harga'],
-                ]);
-                $total += $pitem->total;
-            }
+    $total = 0;
+
+    foreach ($request->items as $item) {
+        if (!empty($item['id'])) {
+            $poItem = PoItem::find($item['id']);
+            $poItem->update([
+                'nama_item' => $item['nama_item'],
+                'qty' => $item['qty'],
+                'harga' => $item['harga'],
+                'total' => $item['qty'] * $item['harga'],
+                'spesifikasi' => $item['spesifikasi'] ?? null,
+    'satuan'      => $item['satuan'] ?? null,
+
+            ]);
+        } else {
+            $poItem = PoItem::create([
+                'po_id' => $po->id,
+                'nama_item' => $item['nama_item'],
+                'qty' => $item['qty'],
+                'harga' => $item['harga'],
+                'total' => $item['qty'] * $item['harga'],
+                'spesifikasi' => $item['spesifikasi'] ?? null,
+'satuan' => $item['satuan'] ?? null,
+
+            ]);
         }
 
-        $po->total = $total;
-        $po->save();
-
-        // Update revision history
-        $history = $po->revision_history ? json_decode($po->revision_history,true) : [];
-        $history[] = [
-            'user_id' => Auth::id(),
-            'action' => 'updated',
-            'timestamp' => now()->toDateTimeString(),
-            'note' => 'Admin updated PO header/items'
-        ];
-        $po->revision_history = json_encode($history);
-        $po->save();
-
-        return redirect()->route('admin.po.show', $po->id)->with('success','PO updated');
+        $total += $poItem->total;
     }
+
+    $po->update(['total' => $total]);
+    // HAPUS PDF LAMA JIKA ADA
+if ($po->file_po && Storage::disk('public')->exists($po->file_po)) {
+    Storage::disk('public')->delete($po->file_po);
+}
+
+// reset status pdf
+$po->update([
+    'file_po' => null,
+    'status' => 'draft'
+]);
+
+
+    return redirect()
+        ->route('admin.po.show', $po->id)
+        ->with('success', 'PO berhasil diperbarui');
+}
+
 
     // Generate draft PDF (optional)
     public function generatePdf($id)
-    {
-        $po = PurchaseOrder::with(['kontrak','vendor','items'])->findOrFail($id);
-        $pdf = PDF::loadView('pdf.po', compact('po'))->setPaper('a4','portrait');
+{
+    $po = PurchaseOrder::with(['items','vendor','kontrak'])->findOrFail($id);
 
-        $filename = "po/PO-{$po->id}-{$po->nomor_po}.pdf";
-        Storage::disk('public')->put($filename, $pdf->output());
-
-        $po->file_pdf = $filename;
-        $po->save();
-
-        return redirect()->route('admin.po.show', $po->id)->with('success','PDF generated');
+    if ($po->items->count() == 0) {
+        return back()->withErrors('Item PO masih kosong');
     }
+
+    $pdf = Pdf::loadView('admin.po.pdf', compact('po'))
+        ->setPaper('A4', 'portrait');
+
+    $fileName = 'po/PO-' . $po->nomor_po . '.pdf';
+    Storage::disk('public')->put($fileName, $pdf->output());
+
+    $po->update([
+        'file_po' => $fileName,
+        'status' => 'approved'
+    ]);
+
+    return redirect()
+        ->route('admin.po.show', $po->id)
+        ->with('success', 'PDF PO berhasil digenerate');
+}
+
 
     // Generate final signed PDF
     public function generateSignedPdf(Request $request, $id)

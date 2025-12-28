@@ -45,10 +45,15 @@ public function penawarans()
 {
     return $this->hasMany(Penawaran::class, 'pengadaan_id');
 }
-public function kontrak()
+public function kontraks()
 {
-    return $this->hasOne(Kontrak::class);
+    return $this->hasMany(\App\Models\Kontrak::class);
 }
 
+
+public function purchaseOrders()
+{
+    return $this->hasMany(PurchaseOrder::class);
+}
 
 }

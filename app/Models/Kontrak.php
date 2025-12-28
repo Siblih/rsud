@@ -37,7 +37,8 @@ class Kontrak extends Model
     }
     public function purchaseOrders()
 {
-    return $this->hasMany(PurchaseOrder::class);
+    return $this->hasMany(\App\Models\PurchaseOrder::class);
 }
+
 
 }

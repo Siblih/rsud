@@ -156,7 +156,7 @@ Route::prefix('po')->name('po.')->group(function () {
     // Update PO
     Route::put('/{id}', [PurchaseOrderController::class, 'update'])->name('update');
 });
-Route::get('/po/{id}/generate-pdf', [PurchaseOrderController::class, 'generatePdf'])->name('po.generatePdf');
+Route::get('/po/{id}/generate-pdf', [PurchaseOrderController::class, 'generatePdf'])->name('po.generate-pdf');
 Route::post('/po/{id}/generate-signed-pdf', [PurchaseOrderController::class, 'generateSignedPdf'])->name('po.generateSignedPdf');
 
 
