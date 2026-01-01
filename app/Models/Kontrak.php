@@ -29,6 +29,8 @@ class Kontrak extends Model
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
+        
+
     }
 
     public function pengadaan()
@@ -38,6 +40,10 @@ class Kontrak extends Model
     public function purchaseOrders()
 {
     return $this->hasMany(\App\Models\PurchaseOrder::class);
+}
+public function payments()
+{
+    return $this->hasMany(Payment::class);
 }
 
 

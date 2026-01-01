@@ -98,39 +98,33 @@
     </main>
 
     {{-- ⚡ FOOTER TRANSPARAN (BOTTOM NAVIGATION MODERN PUTIH) --}}
-<footer class="glass fixed bottom-0 left-0 w-full py-2 rounded-t-3xl shadow-lg flex justify-around items-center backdrop-blur-xl border-t border-white/20 text-white">
-    {{-- 🏠 Dashboard --}}
-    <a href="{{ route('unit.dashboard') }}" 
-       class="flex flex-col items-center text-[11px] {{ request()->routeIs('unit.dashboard') ? 'text-blue-300 font-semibold' : 'text-white hover:text-blue-200' }}">
-        <i data-lucide="home" class="w-5 h-5 mb-0.5"></i>
-        <span>Beranda</span>
-    </a>
+<footer
+  class="glass fixed bottom-0 left-0 w-full py-3 rounded-t-3xl shadow-lg
+         flex justify-center items-center gap-x-6
+         backdrop-blur-xl border-t border-white/20 text-white">
 
-    {{-- 📊 Statistik --}}
-    <button class="flex flex-col items-center text-[11px] text-white hover:text-blue-200">
-        <i data-lucide="pie-chart" class="w-5 h-5 mb-0.5"></i>
-        <span>Statistik</span>
-    </button>
+  <!-- Dashboard -->
+  <a href="{{ route('unit.dashboard') }}"
+     class="bg-white text-blue-600 rounded-full p-3 shadow-lg
+            border-4 border-white/30
+            flex flex-col items-center justify-center
+            hover:scale-105 transition">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium mt-1">Dashboard</span>
+  </a>
 
-    {{-- 📋 Pengadaan (tombol utama) --}}
-    <a href="{{ route('unit.pengadaan.index') }}"
-       class="relative -top-3 bg-white text-blue-600 rounded-full p-3 shadow-lg border-4 border-white/30 flex flex-col items-center justify-center hover:scale-105 transition">
-        <i data-lucide="clipboard-list" class="w-5 h-5 mb-0.5"></i>
-        <span class="text-[10px] font-medium mt-0.5">Pengadaan</span>
-    </a>
+  <!-- Pengadaan -->
+  <a href="{{ route('unit.pengadaan.index') }}"
+     class="bg-white text-blue-600 rounded-full p-3 shadow-lg
+            border-4 border-white/30
+            flex flex-col items-center justify-center
+            hover:scale-105 transition">
+      <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium mt-1">Pengadaan</span>
+  </a>
 
-    {{-- 🔔 Notifikasi --}}
-    <button class="flex flex-col items-center text-[11px] text-white hover:text-blue-200">
-        <i data-lucide="bell" class="w-5 h-5 mb-0.5"></i>
-        <span>Notifikasi</span>
-    </button>
-
-    {{-- 👤 Profil --}}
-    <button class="flex flex-col items-center text-[11px] text-white hover:text-blue-200">
-        <i data-lucide="user" class="w-5 h-5 mb-0.5"></i>
-        <span>Profil</span>
-    </button>
 </footer>
+
 
 
     <script>

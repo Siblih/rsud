@@ -131,26 +131,60 @@
 
   </div>
 
-  {{-- 💰 Status Pembayaran --}}
-  <div class="mt-6 bg-white/10 backdrop-blur-lg border border-white/20 
-       rounded-2xl shadow-xl p-5">
+  {{-- ========================= --}}
+{{-- 💰 STATUS PEMBAYARAN --}}
+{{-- ========================= --}}
+<div id="pembayaran"
+     class="mt-10 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-xl">
 
-    <h2 class="text-blue-200 font-semibold mb-3 flex items-center gap-2">
-      <i data-lucide="credit-card" class="w-4 h-4"></i> Status Pembayaran
-    </h2>
+    <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        💳 Status Pembayaran
+    </h3>
 
-    <p class="text-sm">
-      Status: <span class="font-semibold text-white">
-        {{ ucfirst($kontrak->status_pembayaran ?? 'menunggu') }}
-      </span>
-    </p>
+    @if ($kontrak->status_pembayaran === 'paid')
+        {{-- ✅ SUDAH DIBAYAR --}}
+        <div class="flex flex-col gap-3">
+            <span class="inline-block w-fit px-4 py-1 rounded-full text-sm font-semibold
+                         bg-green-400/20 text-green-300">
+                ✅ Sudah Dibayar
+            </span>
 
-    <p class="text-sm text-blue-300 mt-1">
-      Catatan: {{ $kontrak->catatan_pembayaran ?? 'Tidak ada catatan.' }}
-    </p>
-  </div>
+            @if ($kontrak->bukti_pembayaran)
+                <a href="{{ asset('storage/' . $kontrak->bukti_pembayaran) }}"
+                   target="_blank"
+                   class="inline-flex items-center gap-2 w-fit
+                          bg-blue-600 hover:bg-blue-700
+                          text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">
+                    📄 Download Bukti Pembayaran
+                </a>
+            @else
+                <p class="text-yellow-300 text-sm">
+                    ⚠️ Bukti pembayaran belum diunggah.
+                </p>
+            @endif
+        </div>
+
+    @elseif ($kontrak->status_pembayaran === 'process')
+        {{-- ⏳ DALAM PROSES --}}
+        <span class="inline-block px-4 py-1 rounded-full text-sm font-semibold
+                     bg-yellow-400/20 text-yellow-300">
+            ⏳ Dalam Proses Pembayaran
+        </span>
+
+    @else
+        {{-- ❌ BELUM DIBAYAR --}}
+        <span class="inline-block px-4 py-1 rounded-full text-sm font-semibold
+                     bg-red-400/20 text-red-300">
+            ❌ Belum Dibayar
+        </span>
+
+        <p class="text-blue-200 text-sm mt-3">
+            Pembayaran akan diproses setelah seluruh dokumen dan kontrak selesai diverifikasi.
+        </p>
+    @endif
 
 </div>
+
 {{-- 🔘 Tombol Kembali (Floating) --}}
 <div class="fixed bottom-20 left-0 right-0 flex justify-center z-50">
   <a href="{{ route('vendor.kontrak') }}"

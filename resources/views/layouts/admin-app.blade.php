@@ -82,18 +82,13 @@
         <span>Pengadaan</span>
     </a>
 
-    {{-- 📊 Laporan --}}
-    <a href="{{ route('admin.laporan') }}"
-       class="flex flex-col items-center text-[11px] {{ request()->routeIs('admin.laporan*') ? 'text-blue-300 font-semibold' : 'text-white hover:text-blue-200' }}">
-        <i data-lucide="bar-chart-3" class="w-5 h-5 mb-0.5"></i>
-        <span>Laporan</span>
-    </a>
+    
 
-    {{-- 🧾 Log Aktivitas --}}
-    <a href="{{ route('admin.log') }}"
+    {{-- 🧾 manage penawaran --}}
+    <a href="{{ route('admin.penawaran.index') }}"
        class="flex flex-col items-center text-[11px] {{ request()->routeIs('admin.log*') ? 'text-blue-300 font-semibold' : 'text-white hover:text-blue-200' }}">
         <i data-lucide="file-text" class="w-5 h-5 mb-0.5"></i>
-        <span>Log</span>
+        <span>Penawaran</span>
     </a>
 </footer>
 

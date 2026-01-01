@@ -89,18 +89,41 @@
                                 <td class="border border-white/10 p-2">{{ $p->nama_pengadaan ?? '-' }}</td>
                                 <td class="border border-white/10 p-2">{{ $p->unit->name ?? '-' }}</td>
                                 <td class="border border-white/10 p-2 text-right">{{ number_format($p->estimasi_anggaran ?? 0, 0, ',', '.') }}</td>
-                                <td class="border border-white/10 p-2 text-center">
-                                    <span class="px-2 py-1 text-xs rounded-full 
-                                        @if($p->status == 'disetujui') bg-green-500/30 text-green-200
-                                        @elseif($p->status == 'ditolak') bg-red-500/30 text-red-200
-                                        @else bg-yellow-500/30 text-yellow-200 @endif">
-                                        {{ ucfirst($p->status ?? 'menunggu') }}
-                                    </span>
-                                </td>
-                                <td class="border border-white/10 p-2 text-center">
-                                    <a href="{{ route('admin.pengadaan.show', $p->id) }}" 
-                                       class="text-blue-300 hover:underline">Detail</a>
-                                </td>
+                               <td class="border border-white/10 p-2 text-center aksi">
+    <div class="flex flex-wrap gap-1 justify-center">
+        <a href="{{ route('admin.pengadaan.show', $p->id) }}" class="px-2 py-1 rounded bg-blue-500/20 text-blue-300 text-xs font-medium hover:bg-blue-500/30">Detail</a>
+
+        @if($p->status === 'menunggu')
+            <form action="{{ route('admin.pengadaan.updateStatus', $p->id) }}" method="POST" class="inline">
+                @csrf
+                <input type="hidden" name="status" value="disetujui">
+                <button class="px-2 py-1 rounded bg-green-500/20 text-green-300 text-xs font-medium hover:bg-green-500/30">Setujui</button>
+            </form>
+
+            <form action="{{ route('admin.pengadaan.updateStatus', $p->id) }}" method="POST" class="inline">
+                @csrf
+                <input type="hidden" name="status" value="ditolak">
+                <button class="px-2 py-1 rounded bg-red-500/20 text-red-300 text-xs font-medium hover:bg-red-500/30">Tolak</button>
+            </form>
+        @endif
+
+        @if($p->status === 'disetujui')
+            <a href="{{ route('admin.kontrak.create', $p->id) }}" class="px-2 py-1 rounded bg-yellow-500/20 text-yellow-300 text-xs font-medium hover:bg-yellow-500/30">Buat Kontrak</a>
+        @endif
+    </div>
+</td>
+
+<td class="border border-white/10 p-2 text-sm keterangan">
+    @if($p->status === 'menunggu')
+        <span class="text-yellow-300 font-medium">⏳ Menunggu persetujuan</span>
+    @elseif($p->status === 'disetujui')
+        <span class="text-green-300 font-medium">✅ Disetujui</span>
+    @elseif($p->status === 'ditolak')
+        <span class="text-red-300 font-medium">❌ Ditolak</span>
+    @endif
+</td>
+
+                            
                             </tr>
                         @empty
                             <tr>
@@ -180,9 +203,9 @@
                     <td class="border border-white/10 p-2 text-center">{{ $i + 1 }}</td>
                     <td class="border border-white/10 p-2">{{ $k->nomor_kontrak }}</td>
                     <td class="border border-white/10 p-2">{{ $k->pengadaan->nama_pengadaan }}</td>
-                    <td class="border border-white/10 p-2">
-                      {{ $k->vendor->name ?? '-' }}
-                    </td>
+                   <td class="border border-white/10 p-2">
+  {{ $k->vendor->vendorProfile->company_name ?? '-' }}
+</td>
                     <td class="border border-white/10 p-2 text-center">
                         <span class="px-2 py-1 text-xs rounded-full 
                             @if($k->status == 'aktif') bg-green-500/30 text-green-200

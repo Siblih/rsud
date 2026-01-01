@@ -133,19 +133,7 @@
         <span>Kontrak</span>
     </a>
 
-    {{-- 🔔 Notifikasi --}}
-    <a href="{{ route('vendor.notifikasi') }}" 
-       class="flex flex-col items-center text-[11px] {{ request()->routeIs('vendor.notifikasi*') ? 'text-blue-300 font-semibold' : 'text-white hover:text-blue-200' }}">
-        <i data-lucide="bell" class="w-5 h-5 mb-0.5"></i>
-        <span>Notifikasi</span>
-    </a>
-
-    {{-- 📈 Riwayat --}}
-    <a href="{{ route('vendor.riwayat') }}" 
-       class="flex flex-col items-center text-[11px] {{ request()->routeIs('vendor.riwayat*') ? 'text-blue-300 font-semibold' : 'text-white hover:text-blue-200' }}">
-        <i data-lucide="bar-chart-3" class="w-5 h-5 mb-0.5"></i>
-        <span>Riwayat</span>
-    </a>
+  
 </footer>
 
 

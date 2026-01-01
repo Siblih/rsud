@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('kontraks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vendor_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('vendor_id')->constrained('vendor_profiles')->onDelete('cascade');
             $table->foreignId('pengadaan_id')->constrained('pengadaans')->onDelete('cascade');
             $table->string('nomor_kontrak')->unique();
             $table->decimal('nilai_kontrak', 18, 2)->nullable();

@@ -46,11 +46,12 @@
 </a>
 
 
-    <a href="{{ url('/vendor/riwayat') }}" 
-       class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-md p-5 text-center hover:bg-white/20 transition-all duration-300">
-      <div class="text-3xl mb-2">📜</div>
-      <p class="text-sm font-semibold text-blue-100">Riwayat</p>
-    </a>
+    <a href="{{ route('vendor.kontrak') }}" 
+   class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-md p-5 text-center hover:bg-white/20 transition-all duration-300">
+  <div class="text-3xl mb-2">📜</div>
+  <p class="text-sm font-semibold text-blue-100">Kontrak Saya</p>
+</a>
+
 
     <a href="{{ route('vendor.documents.create') }}" 
        class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-md p-5 text-center hover:bg-white/20 transition-all duration-300">

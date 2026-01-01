@@ -9,6 +9,8 @@ class Penawaran extends Model
 {
     use HasFactory;
 
+    protected $table = 'penawarans'; // 🔴 WAJIB JELASIN
+
     protected $fillable = [
         'pengadaan_id',
         'vendor_id',
@@ -17,14 +19,11 @@ class Penawaran extends Model
         'status',
     ];
 
-    // Relasi ke tabel pengadaan
     public function pengadaan()
-{
-    return $this->belongsTo(Pengadaan::class, 'pengadaan_id');
-}
+    {
+        return $this->belongsTo(Pengadaan::class);
+    }
 
-
-    // Relasi ke user (vendor)
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');

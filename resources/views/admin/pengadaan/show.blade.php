@@ -116,33 +116,6 @@
             @endif
         </div>
 
-        {{-- UPDATE STATUS --}}
-        <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2">
-                <i data-lucide="refresh-cw" class="w-5 h-5 text-purple-300"></i>
-                Update Status Pengadaan
-            </h3>
-
-            <form action="{{ route('admin.pengadaan.updateStatus', $pengadaan->id) }}"
-                  method="POST"
-                  class="max-w-md">
-                @csrf
-
-                <select name="status"
-                        class="w-full p-2 rounded-lg bg-white/10 border border-white/20 text-white mb-3">
-                    <option value="Proses" {{ $pengadaan->status == 'Proses' ? 'selected' : '' }}>Proses</option>
-                    <option value="Kontrak Aktif" {{ $pengadaan->status == 'Kontrak Aktif' ? 'selected' : '' }}>Kontrak Aktif</option>
-                    <option value="Selesai" {{ $pengadaan->status == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                    <option value="Dibatalkan" {{ $pengadaan->status == 'Dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
-                </select>
-
-                <button type="submit"
-                        class="px-5 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg shadow">
-                    💾 Simpan Perubahan
-                </button>
-            </form>
-        </div>
-
-    </div>
+        
 </div>
 @endsection

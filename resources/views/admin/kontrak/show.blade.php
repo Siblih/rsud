@@ -26,7 +26,8 @@
 
             <div class="bg-white/10 p-4 rounded-xl border border-white/10">
                 <p class="text-gray-300 text-sm">Vendor</p>
-                <p class="text-lg font-semibold">{{ $kontrak->vendor->name }}</p>
+               <p class="text-lg font-semibold">{{ $kontrak->vendor->vendorProfile->company_name ?? '-' }}</p>
+
             </div>
 
             <div class="bg-white/10 p-4 rounded-xl border border-white/10">
@@ -81,33 +82,7 @@
                 @endif
             </div>
 
-            {{-- PO Signed --}}
-            <div class="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-between items-center">
-                <span>PO Signed</span>
-                @if($kontrak->po_signed)
-                    <a href="{{ asset('storage/'.$kontrak->po_signed) }}" 
-                       target="_blank"
-                       class="text-blue-300 underline hover:text-blue-400">
-                        Download
-                    </a>
-                @else
-                    <span class="text-gray-400">Tidak ada</span>
-                @endif
-            </div>
-
-            {{-- BAST Signed --}}
-            <div class="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-between items-center">
-                <span>BAST Signed</span>
-                @if($kontrak->bast_signed)
-                    <a href="{{ asset('storage/'.$kontrak->bast_signed) }}" 
-                       target="_blank"
-                       class="text-blue-300 underline hover:text-blue-400">
-                        Download
-                    </a>
-                @else
-                    <span class="text-gray-400">Tidak ada</span>
-                @endif
-            </div>
+            
 
         </div>
 {{-- BUAT PO (lebih lengkap & kondisional) --}}

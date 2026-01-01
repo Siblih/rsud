@@ -16,101 +16,100 @@
       <div class="w-6"></div>
     </div>
 
-    <!-- Form Card -->
-    <form method="POST" action="{{ route('unit.pengadaan.store') }}"
-          class="bg-white/10 backdrop-blur-lg p-5 rounded-2xl shadow-xl space-y-5 border border-white/20">
+    <!-- Form -->
+    <form method="POST" action="{{ route('unit.pengadaan.update', $pengadaan->id) }}">
       @csrf
+      @method('PUT')
 
-      <!-- Nama Pengadaan -->
+      <!-- Nama -->
       <div>
         <label class="block text-sm font-semibold mb-1 text-blue-200">Nama Pengadaan</label>
         <input type="text" name="nama_pengadaan"
-               class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition"
-               placeholder="Contoh: Pengadaan Alat Medis / Jasa Konstruksi" required>
+          value="{{ old('nama_pengadaan', $pengadaan->nama_pengadaan) }}"
+          class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white"
+          required>
       </div>
 
-      <!-- Jenis Pengadaan -->
+      <!-- Jenis -->
       <div>
         <label class="block text-sm font-semibold mb-1 text-blue-200">Jenis Pengadaan</label>
         <select id="jenis_pengadaan" name="jenis_pengadaan"
-                class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
-          <option value="" class="text-gray-700">Pilih Jenis</option>
-          <option value="barang" class="text-gray-700">Barang</option>
-          <option value="jasa" class="text-gray-700">Jasa</option>
+          class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">
+          <option value="">Pilih Jenis</option>
+          <option value="barang" {{ old('jenis_pengadaan', $pengadaan->jenis_pengadaan) == 'barang' ? 'selected' : '' }}>Barang</option>
+          <option value="jasa" {{ old('jenis_pengadaan', $pengadaan->jenis_pengadaan) == 'jasa' ? 'selected' : '' }}>Jasa</option>
         </select>
       </div>
 
-      <!-- === Bagian Barang === -->
+      <!-- BARANG -->
       <div id="form-barang" class="space-y-4 hidden">
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-semibold mb-1 text-blue-200">Jumlah</label>
-            <input type="number" name="jumlah" 
-                   class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent" 
-                   placeholder="0">
+            <label class="text-sm text-blue-200">Jumlah</label>
+            <input type="number" name="jumlah"
+              value="{{ old('jumlah', $pengadaan->jumlah) }}"
+              class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1 text-blue-200">Satuan</label>
-            <input type="text" name="satuan" 
-                   class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent" 
-                   placeholder="Unit / Box / Paket">
+            <label class="text-sm text-blue-200">Satuan</label>
+            <input type="text" name="satuan"
+              value="{{ old('satuan', $pengadaan->satuan) }}"
+              class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1 text-blue-200">Spesifikasi Teknis</label>
+          <label class="text-sm text-blue-200">Spesifikasi Teknis</label>
           <textarea name="spesifikasi" rows="3"
-                    class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                    placeholder="Tuliskan detail teknis barang yang dibutuhkan..."></textarea>
+            class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">{{ old('spesifikasi', $pengadaan->spesifikasi) }}</textarea>
         </div>
       </div>
 
-      <!-- === Bagian Jasa === -->
+      <!-- JASA -->
       <div id="form-jasa" class="space-y-4 hidden">
         <div>
-          <label class="block text-sm font-semibold mb-1 text-blue-200">Uraian Pekerjaan</label>
+          <label class="text-sm text-blue-200">Uraian Pekerjaan</label>
           <textarea name="uraian_pekerjaan" rows="3"
-                    class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                    placeholder="Contoh: Pembangunan ruang rawat inap baru..."></textarea>
+            class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">{{ old('uraian_pekerjaan', $pengadaan->uraian_pekerjaan) }}</textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-semibold mb-1 text-blue-200">Lokasi Pekerjaan</label>
+            <label class="text-sm text-blue-200">Lokasi Pekerjaan</label>
             <input type="text" name="lokasi_pekerjaan"
-                   class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                   placeholder="Contoh: Gedung A">
+              value="{{ old('lokasi_pekerjaan', $pengadaan->lokasi_pekerjaan) }}"
+              class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1 text-blue-200">Waktu Pelaksanaan</label>
+            <label class="text-sm text-blue-200">Waktu Pelaksanaan</label>
             <input type="text" name="waktu_pelaksanaan"
-                   class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                   placeholder="Contoh: 30 Hari">
+              value="{{ old('waktu_pelaksanaan', $pengadaan->waktu_pelaksanaan) }}"
+              class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">
           </div>
         </div>
       </div>
 
-      <!-- Estimasi & Alasan -->
+      <!-- Estimasi -->
       <div>
-        <label class="block text-sm font-semibold mb-1 text-blue-200">Estimasi Anggaran (Rp)</label>
+        <label class="text-sm text-blue-200">Estimasi Anggaran</label>
         <input type="number" name="estimasi_anggaran"
-               class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition"
-               placeholder="0">
+          value="{{ old('estimasi_anggaran', $pengadaan->estimasi_anggaran) }}"
+          class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">
       </div>
 
+      <!-- Alasan -->
       <div>
-        <label class="block text-sm font-semibold mb-1 text-blue-200">Alasan Kebutuhan</label>
+        <label class="text-sm text-blue-200">Alasan</label>
         <textarea name="alasan" rows="2"
-                  class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition"
-                  placeholder="Kenapa pengadaan ini dibutuhkan..."></textarea>
+          class="w-full rounded-xl p-3 bg-white/10 border border-white/20 text-white">{{ old('alasan', $pengadaan->alasan) }}</textarea>
       </div>
 
       <!-- Tombol -->
-      @if(!isset($pengadaan) || (isset($pengadaan) && $pengadaan->status == 'menunggu'))
-      <div class="pt-3">
+      @if($pengadaan->status === 'menunggu')
+      <div class="pt-4">
         <button type="submit"
-                class="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold py-3 rounded-xl shadow-md hover:opacity-90 active:scale-95 transition-all">
-          🚀 {{ isset($pengadaan) ? 'Perbarui' : 'Kirim' }} Pengajuan
+          class="w-full bg-blue-600 py-3 rounded-xl font-semibold">
+          💾 Perbarui Pengadaan
         </button>
       </div>
       @endif
@@ -119,21 +118,20 @@
 </div>
 
 <script>
-  // Ubah form sesuai jenis pengadaan
+document.addEventListener('DOMContentLoaded', () => {
+  const jenis = "{{ old('jenis_pengadaan', $pengadaan->jenis_pengadaan) }}";
+  const barang = document.getElementById('form-barang');
+  const jasa = document.getElementById('form-jasa');
+
+  if (jenis === 'barang') barang.classList.remove('hidden');
+  if (jenis === 'jasa') jasa.classList.remove('hidden');
+
   document.getElementById('jenis_pengadaan').addEventListener('change', function () {
-    const formBarang = document.getElementById('form-barang');
-    const formJasa = document.getElementById('form-jasa');
-    
-    if (this.value === 'barang') {
-      formBarang.classList.remove('hidden');
-      formJasa.classList.add('hidden');
-    } else if (this.value === 'jasa') {
-      formJasa.classList.remove('hidden');
-      formBarang.classList.add('hidden');
-    } else {
-      formBarang.classList.add('hidden');
-      formJasa.classList.add('hidden');
-    }
+    barang.classList.add('hidden');
+    jasa.classList.add('hidden');
+    if (this.value === 'barang') barang.classList.remove('hidden');
+    if (this.value === 'jasa') jasa.classList.remove('hidden');
   });
+});
 </script>
 @endsection

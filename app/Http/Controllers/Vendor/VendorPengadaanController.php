@@ -16,7 +16,7 @@ class VendorPengadaanController extends Controller
     // 📦 Daftar pengadaan yang sudah disetujui
     public function index()
     {
-        $pengadaans = Pengadaan::with(['penawaran' => function ($q) {
+        $pengadaans = Pengadaan::with(['penawarans' => function ($q) {
                 $q->where('vendor_id', auth()->id());
             }])
             ->where('status', 'disetujui')   // STATUS YANG BENAR
@@ -28,22 +28,41 @@ class VendorPengadaanController extends Controller
 
     // 🔍 Detail pengadaan
     public function show($id)
-    {
-        $pengadaan = Pengadaan::where('status', 'disetujui') // filter lagi
-            ->findOrFail($id);
+{
+    $pengadaan = Pengadaan::with(['unit'])
+        ->where('status', 'disetujui')
+        ->findOrFail($id);
 
-        $penawaran = Penawaran::where('pengadaan_id', $id)
-            ->where('vendor_id', Auth::id())
-            ->first();
+    // 🔹 Ambil penawaran vendor login (jika ada)
+    $penawaran = Penawaran::where('pengadaan_id', $pengadaan->id)
+        ->where('vendor_id', Auth::id())
+        ->first();
 
-        return view('vendor.pengadaan.show', compact('pengadaan', 'penawaran'));
-    }
+    // 🔹 Fallback Kode Tender
+    $pengadaan->kode_tender = $pengadaan->kode_tender
+        ?? 'TDR-' . date('Y') . '-' . str_pad($pengadaan->id, 5, '0', STR_PAD_LEFT);
+
+    // 🔹 Fallback Informasi Pekerjaan (sesuai permintaan kamu)
+    $pengadaan->uraian_pekerjaan = $pengadaan->uraian_pekerjaan
+        ?? $pengadaan->nama_pengadaan;
+
+    $pengadaan->lokasi_pekerjaan = $pengadaan->lokasi_pekerjaan
+        ?? (($pengadaan->unit->name ?? '-') . ' RSUD BANGIL');
+
+    $pengadaan->waktu_pelaksanaan = $pengadaan->waktu_pelaksanaan
+        ?? \Carbon\Carbon::parse($pengadaan->batas_penawaran)
+            ->translatedFormat('d M Y H:i');
+
+    return view('vendor.pengadaan.show', compact('pengadaan', 'penawaran'));
+}
+
 
     // 📤 Vendor mengirim penawaran
     public function submitPenawaran(Request $request, $id)
     {
         $request->validate([
-            'file_penawaran' => 'required|mimes:pdf,doc,docx|max:2048',
+           'file_penawaran' => 'required|file|mimetypes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:2048',
+
             'harga' => 'required|numeric|min:0',
         ]);
 

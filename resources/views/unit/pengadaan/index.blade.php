@@ -34,9 +34,13 @@
             🔍
           </button>
 
-          @if($p->status == 'menunggu')
-          <a href="{{ route('unit.pengadaan.edit', $p->id) }}" 
-             class="bg-yellow-500/20 hover:bg-yellow-500/30 p-2 rounded-lg text-yellow-300 transition">✏️</a>
+          @if($p->status === 'menunggu')
+  <a href="{{ route('unit.pengadaan.edit', $p->id) }}"
+     class="bg-yellow-500/20 hover:bg-yellow-500/30 p-2 rounded-lg text-yellow-300 transition">
+     ✏️
+  </a>
+
+
 
           <form action="{{ route('unit.pengadaan.destroy', $p->id) }}" method="POST" 
                 onsubmit="return confirm('Yakin ingin menghapus pengadaan ini?')">
@@ -81,87 +85,143 @@
 <!-- Modal Detail -->
 <div id="detailModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 px-3">
   <div class="bg-[#2F377B] text-white rounded-2xl shadow-2xl max-w-md w-full p-6 overflow-y-auto max-h-[90vh] relative border border-white/10 backdrop-blur-md">
-    <button onclick="closeDetail()" class="absolute top-3 right-3 text-gray-300 hover:text-white text-2xl font-bold">&times;</button>
+
+    <button onclick="closeDetail()"
+      class="absolute top-3 right-3 text-gray-300 hover:text-white text-2xl font-bold">
+      &times;
+    </button>
+
     <h3 class="text-xl font-bold mb-5" id="modalNama"></h3>
 
     <div class="space-y-4">
+
+      <!-- Jenis -->
       <div class="bg-[#323B85] rounded-xl p-3">
-        <p class="text-sm text-gray-300 font-semibold">Kategori</p>
-        <p id="modalJenis" class="text-white"></p>
+        <p class="text-sm text-gray-300 font-semibold">Jenis Pengadaan</p>
+        <p id="modalJenis"></p>
       </div>
 
-      <div class="bg-[#323B85] rounded-xl p-3 grid grid-cols-2 gap-3">
-        <div>
-          <p class="text-sm text-gray-300 font-semibold">Jumlah</p>
-          <p id="modalJumlah" class="text-white"></p>
+      <!-- ===== BARANG ===== -->
+      <div id="detail-barang" class="space-y-4 hidden">
+
+        <div class="bg-[#323B85] rounded-xl p-3 grid grid-cols-2 gap-3">
+          <div>
+            <p class="text-sm text-gray-300 font-semibold">Jumlah</p>
+            <p id="modalJumlah"></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-300 font-semibold">Satuan</p>
+            <p id="modalSatuan"></p>
+          </div>
         </div>
-        <div>
-          <p class="text-sm text-gray-300 font-semibold">Satuan</p>
-          <p id="modalSatuan" class="text-white"></p>
+
+        <div class="bg-[#323B85] rounded-xl p-3">
+          <p class="text-sm text-gray-300 font-semibold">Spesifikasi Teknis</p>
+          <p id="modalSpesifikasi"></p>
         </div>
       </div>
 
+      <!-- ===== JASA ===== -->
+      <div id="detail-jasa" class="space-y-4 hidden">
+
+        <div class="bg-[#323B85] rounded-xl p-3">
+          <p class="text-sm text-gray-300 font-semibold">Uraian Pekerjaan</p>
+          <p id="modalUraian"></p>
+        </div>
+
+        <div class="bg-[#323B85] rounded-xl p-3 grid grid-cols-2 gap-3">
+          <div>
+            <p class="text-sm text-gray-300 font-semibold">Lokasi Pekerjaan</p>
+            <p id="modalLokasi"></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-300 font-semibold">Waktu Pelaksanaan</p>
+            <p id="modalWaktu"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estimasi -->
       <div class="bg-[#323B85] rounded-xl p-3">
         <p class="text-sm text-gray-300 font-semibold">Estimasi Anggaran</p>
-        <p id="modalNilai" class="text-blue-300 font-semibold text-lg">Rp0</p>
+        <p id="modalNilai" class="text-blue-300 font-semibold text-lg"></p>
       </div>
 
+      <!-- Alasan -->
       <div class="bg-[#323B85] rounded-xl p-3">
-        <p class="text-sm text-gray-300 font-semibold">Spesifikasi / Uraian</p>
-        <p id="modalSpesifikasi" class="text-white"></p>
+        <p class="text-sm text-gray-300 font-semibold">Alasan Kebutuhan</p>
+        <p id="modalAlasan"></p>
       </div>
 
-      <div class="bg-[#323B85] rounded-xl p-3">
-        <p class="text-sm text-gray-300 font-semibold">Alasan</p>
-        <p id="modalAlasan" class="text-white"></p>
-      </div>
-
+      <!-- Status -->
       <div class="bg-[#323B85] rounded-xl p-3 flex justify-between items-center">
         <div>
           <p class="text-sm text-gray-300 font-semibold">Status</p>
-          <span id="modalStatus" class="px-2 py-1 rounded-full text-white font-semibold text-xs"></span>
+          <span id="modalStatus" class="px-2 py-1 rounded-full text-xs font-semibold"></span>
         </div>
         <div>
-          <p class="text-sm text-gray-300 font-semibold">Diajukan pada</p>
-          <p id="modalTanggal" class="text-gray-200 text-sm"></p>
+          <p class="text-sm text-gray-300 font-semibold">Diajukan</p>
+          <p id="modalTanggal" class="text-sm text-gray-200"></p>
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
+
+
 <script>
-  const pengadaans = @json($pengadaans);
+const pengadaans = @json($pengadaans);
 
-  function showDetail(id) {
-    const p = pengadaans.find(item => item.id === id);
-    if (!p) return;
+function showDetail(id) {
+  const p = pengadaans.find(x => x.id === id);
+  if (!p) return;
 
-    document.getElementById('modalNama').textContent = p.nama_pengadaan;
-    document.getElementById('modalJenis').textContent = p.jenis_pengadaan || '-';
-    document.getElementById('modalJumlah').textContent = p.jumlah ?? '-';
-    document.getElementById('modalSatuan').textContent = p.satuan ?? '-';
-    document.getElementById('modalNilai').textContent = `Rp${(p.estimasi_anggaran ?? 0).toLocaleString('id-ID')}`;
-    document.getElementById('modalSpesifikasi').textContent = p.spesifikasi || p.uraian_pekerjaan || '-';
-    document.getElementById('modalAlasan').textContent = p.alasan || '-';
+  // Basic
+  modalNama.textContent = p.nama_pengadaan;
+  modalJenis.textContent = p.jenis_pengadaan.toUpperCase();
+  modalNilai.textContent = `Rp ${Number(p.estimasi_anggaran ?? 0).toLocaleString('id-ID')}`;
+  modalAlasan.textContent = p.alasan ?? '-';
 
-    const statusEl = document.getElementById('modalStatus');
-    statusEl.textContent = p.status;
-    statusEl.className = 'px-2 py-1 rounded-full text-white font-semibold text-xs';
-    if(p.status === 'menunggu') statusEl.classList.add('bg-yellow-500');
-    else if(p.status === 'disetujui') statusEl.classList.add('bg-green-500');
-    else if(p.status === 'ditolak') statusEl.classList.add('bg-red-500');
+  // Reset
+  document.getElementById('detail-barang').classList.add('hidden');
+  document.getElementById('detail-jasa').classList.add('hidden');
 
-    document.getElementById('modalTanggal').textContent = new Date(p.created_at)
-      .toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
-
-    document.getElementById('detailModal').classList.remove('hidden');
-    document.getElementById('detailModal').classList.add('flex');
+  // BARANG
+  if (p.jenis_pengadaan === 'barang') {
+    document.getElementById('detail-barang').classList.remove('hidden');
+    modalJumlah.textContent = p.jumlah ?? '-';
+    modalSatuan.textContent = p.satuan ?? '-';
+    modalSpesifikasi.textContent = p.spesifikasi ?? '-';
   }
 
-  function closeDetail() {
-    document.getElementById('detailModal').classList.add('hidden');
-    document.getElementById('detailModal').classList.remove('flex');
+  // JASA
+  if (p.jenis_pengadaan === 'jasa') {
+    document.getElementById('detail-jasa').classList.remove('hidden');
+    modalUraian.textContent = p.uraian_pekerjaan ?? '-';
+    modalLokasi.textContent = p.lokasi_pekerjaan ?? '-';
+    modalWaktu.textContent = p.waktu_pelaksanaan ?? '-';
   }
+
+  // Status
+  modalStatus.textContent = p.status;
+  modalStatus.className = 'px-2 py-1 rounded-full text-xs font-semibold';
+  if (p.status === 'menunggu') modalStatus.classList.add('bg-yellow-500');
+  if (p.status === 'disetujui') modalStatus.classList.add('bg-green-500');
+  if (p.status === 'ditolak') modalStatus.classList.add('bg-red-500');
+
+  modalTanggal.textContent =
+    new Date(p.created_at).toLocaleString('id-ID');
+
+  detailModal.classList.remove('hidden');
+  detailModal.classList.add('flex');
+}
+
+function closeDetail() {
+  detailModal.classList.add('hidden');
+  detailModal.classList.remove('flex');
+}
 </script>
+
 @endsection

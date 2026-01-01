@@ -18,6 +18,12 @@ use App\Http\Controllers\Admin\KontrakController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Vendor\VendorPurchaseOrderController;
+use App\Http\Controllers\Vendor\VendorKontrakController;
+use App\Http\Controllers\Vendor\PaymentController;
+use App\Http\Controllers\Admin\AdminPenawaranController;
+
+
+
 
 
 
@@ -94,7 +100,19 @@ Route::get('/admin/vendor/{id}/documents',
     [VendorController::class, 'documents']
 )->name('vendor.documents');
 
+Route::post('/admin/pengadaan/{id}/update-status', [PengadaanController::class, 'updateStatus'])->name('admin.pengadaan.updateStatus');
 
+// 📋 List pengadaan yang punya penawaran
+    Route::get('/penawaran', [AdminPenawaranController::class, 'index'])
+        ->name('penawaran.index');
+
+    // 🔍 Detail penawaran per pengadaan
+    Route::get('/penawaran/{pengadaan}', [AdminPenawaranController::class, 'show'])
+        ->name('penawaran.show');
+
+    // 🏆 Pilih pemenang
+    Route::post('/penawaran/{penawaran}/menang', [AdminPenawaranController::class, 'setPemenang'])
+        ->name('penawaran.menang');
 
 
         // ======================
@@ -108,6 +126,15 @@ Route::get('/admin/vendor/{id}/documents',
             ->name('verifikasi.produk.setujui');
         Route::post('/verifikasi/produk/{id}/tolak', [VerifikasiController::class, 'rejectProduk'])
             ->name('verifikasi.produk.tolak');
+
+Route::post('/admin/pengadaan/{id}/status', 
+    [AdminPengadaanController::class, 'updateStatus']
+)->name('admin.pengadaan.updateStatus');
+Route::get('kontrak/create/{pengadaan}', [KontrakController::class, 'create'])
+        ->name('kontrak.create');
+
+    Route::post('kontrak', [KontrakController::class, 'store'])
+        ->name('kontrak.store');
 
 
         // ======================
@@ -207,18 +234,18 @@ Route::middleware(['auth', 'role:vendor'])->group(function () {
     Route::post('/vendor/pengadaan/{id}/penawaran', [VendorPengadaanController::class, 'submitPenawaran'])->name('vendor.pengadaan.penawaran');
 
    // 📜 Kontrak & Pembayaran
-Route::get('/vendor/kontrak', [KontrakController::class, 'index'])
+Route::get('/vendor/kontrak', [VendorKontrakController::class, 'index'])
     ->name('vendor.kontrak');
 
-Route::get('/vendor/kontrak/{id}', [KontrakController::class, 'show'])
+Route::get('/vendor/kontrak/{id}', [VendorKontrakController::class, 'show'])
     ->name('vendor.kontrak.show');
 
 // 📤 Halaman Form Upload Dokumen Pembayaran
-Route::get('/vendor/kontrak/{id}/upload', [KontrakController::class, 'uploadForm'])
+Route::get('/vendor/kontrak/{id}/upload', [VendorKontrakController::class, 'uploadForm'])
     ->name('vendor.kontrak.upload.form');
 
 // 📥 Proses Upload Dokumen Pembayaran
-Route::post('/vendor/kontrak/{id}/upload', [KontrakController::class, 'upload'])
+Route::post('/vendor/kontrak/{id}/upload', [VendorKontrakController::class, 'upload'])
     ->name('vendor.kontrak.upload');
 
 
@@ -229,11 +256,7 @@ Route::post('/vendor/po/{id}/sign', [VendorPurchaseOrderController::class, 'sign
 
 
 
-    // 🔔 Notifikasi
-    Route::get('/vendor/notifikasi', [VendorNotifikasiController::class, 'index'])->name('vendor.notifikasi');
-
-    // 📈 Riwayat
-    Route::get('/vendor/riwayat', [VendorRiwayatController::class, 'index'])->name('vendor.riwayat');
+    
 
     // 📂 Dokumen
     Route::get('/vendor/documents/index', [VendorDocumentController::class, 'index'])->name('vendor.documents.index');

@@ -23,7 +23,11 @@
                 <div class="flex justify-between items-start mb-2">
                     <div>
                         <h2 class="text-base font-semibold text-white">{{ $item->nama_paket }}</h2>
-                        <p class="text-xs text-blue-200">Kode: {{ $item->kode_tender }}</p>
+                        <p class="text-xs text-blue-200">
+    Kode: {{ $item->kode_tender 
+        ?? 'TDR-' . date('Y') . '-' . str_pad($item->id, 5, '0', STR_PAD_LEFT) }}
+</p>
+
                     </div>
                     <span class="text-xs px-2 py-1 rounded-full font-semibold 
                         @if($item->status === 'berjalan') bg-yellow-400/20 text-yellow-300
@@ -37,7 +41,14 @@
                     <p>📅 Batas Penawaran: <span class="font-semibold text-white">
                         {{ \Carbon\Carbon::parse($item->batas_penawaran)->translatedFormat('d M Y H:i') }}
                     </span></p>
-                    <p>💰 Nilai HPS: <span class="font-semibold text-white">Rp {{ number_format($item->nilai_hps, 0, ',', '.') }}</span></p>
+                   <p>
+💰 Estimasi Anggaran:
+<span class="font-semibold text-white">
+    Rp {{ number_format($item->estimasi_anggaran, 0, ',', '.') }}
+
+</span>
+</p>
+
                 </div>
 
                 {{-- Status Penawaran --}}

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Penawaran;
+
 
 class Pengadaan extends Model
 {
@@ -19,6 +21,10 @@ class Pengadaan extends Model
         'spesifikasi',
         'alasan',
         'status',
+        'uraian_pekerjaan',
+    'lokasi_pekerjaan',
+    'waktu_pelaksanaan',
+
     ];
     // 🔹 Relasi ke Unit (user dengan role = unit)
    public function unit()
@@ -43,8 +49,9 @@ class Pengadaan extends Model
     
 public function penawarans()
 {
-    return $this->hasMany(Penawaran::class, 'pengadaan_id');
+    return $this->hasMany(Penawaran::class);
 }
+
 public function kontraks()
 {
     return $this->hasMany(\App\Models\Kontrak::class);
