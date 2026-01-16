@@ -6,6 +6,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\VendorPengadaanController;
 use App\Http\Controllers\Api\VendorProductController;
 use App\Http\Controllers\Api\VendorProfileController;
+use App\Http\Controllers\Api\VendorKontrakController;
+use App\Http\Controllers\Api\VendorAccountController;
+use App\Http\Controllers\Api\VendorDocumentController;
+
+
+
 
 
 /*
@@ -45,6 +51,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/vendor/products/{id}', [VendorProductController::class, 'destroy']);
 
     // ===== PENGADAAN =====
-    Route::get('/vendor/pengadaan', [VendorPengadaanController::class, 'index']);
+   Route::get('/vendor/pengadaan', [VendorPengadaanController::class, 'index']);
+   Route::get('/vendor/pengadaan/{id}', [VendorPengadaanController::class, 'show']);
+   Route::get('/vendor/kontrak', [VendorKontrakController::class, 'index']);
+    Route::get('/vendor/kontrak/{id}', [VendorKontrakController::class, 'show']);
+   Route::post('/vendor/kontrak/{id}/upload', [VendorKontrakController::class, 'upload']);
+
+   Route::post('/vendor/account/password', [VendorAccountController::class, 'updatePassword']);
+   Route::get('/vendor/documents', [VendorDocumentController::class, 'show']);
+
+
+
+
 });
 

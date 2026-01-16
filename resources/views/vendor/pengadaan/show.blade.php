@@ -28,7 +28,10 @@
             <p>🏢 Unit Pengaju: <span class="text-white font-semibold">{{ $pengadaan->unit->name ?? '-' }}</span></p>
             <p>📅 Batas Penawaran:
                 <span class="text-yellow-300 font-semibold">
-                    {{ \Carbon\Carbon::parse($pengadaan->batas_penawaran)->translatedFormat('d M Y H:i') }}
+                  {{ optional($pengadaan->batas_penawaran)->translatedFormat('d M Y H:i') ?? '-' }}
+
+
+
                 </span>
             </p>
             <p>💰 Estimasi Anggaran:
@@ -53,7 +56,9 @@
             </p>
             <p>
                 <span class="font-semibold text-white">Waktu Pelaksanaan:</span><br>
-                {{ $pengadaan->waktu_pelaksanaan ?? '-' }}
+               {{ optional($pengadaan->waktu_pelaksanaan_fix)->translatedFormat('d M Y H:i') ?? '-' }}
+
+
             </p>
         </div>
     </div>

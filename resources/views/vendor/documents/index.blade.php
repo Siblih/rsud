@@ -16,9 +16,9 @@
       </div>
 
       <div class="text-center mt-6">
-        <a href="{{ route('vendor.documents.create') }}" 
+        <a href="{{ route('vendor.documents.create') }}"
            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-5 rounded-xl shadow-md transition">
-           📤 Upload Sekarang
+          📤 Upload Sekarang
         </a>
       </div>
     @else
@@ -26,48 +26,80 @@
         <table class="min-w-full text-sm text-white">
           <tbody class="divide-y divide-white/10">
 
-            @foreach ([
-              'nib' => '🧾 NIB (Nomor Induk Berusaha)',
-              'pengalaman' => '🧾 KBLI (Surat Klasifikasi)',
-              'siup' => '📑 PB UMKU (Surat Izin Usaha)',
-              'npwp' => '💳 NPWP',
-              'akta_perusahaan' => '📘 Akta Pendirian & Perubahan Terakhir',
-              'domisili' => '🏠 Surat Domisili',
-              'sertifikat_halal' => '🕌 Sertifikat Halal',
-              'sertifikat_iso' => '🏅 Sertifikat ISO'
-              
-            ] as $field => $label)
-              <tr>
-                <td class="py-3 px-4 font-medium text-blue-200">{{ $label }}</td>
-                <td class="py-3 px-4 text-right">
-                  @if ($documents->$field)
-                   <a href="{{ asset('storage/'.$documents->$field) }}" target="_blank"
-   class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 
-          hover:from-indigo-600 hover:to-blue-700 text-white text-xs font-medium 
-          px-3 py-1.5 rounded-full shadow-md transition-all duration-300 hover:scale-105">
-    <i data-lucide="eye" class="w-4 h-4"></i>
-    <span>Lihat Dokumen</span>
-</a>
+          @foreach ([
+            'nib' => '🧾 NIB (Nomor Induk Berusaha)',
+            'pengalaman' => '🧾 KBLI (Surat Klasifikasi)',
+            'siup' => '📑 PB UMKU (Surat Izin Usaha)',
+            'npwp' => '💳 NPWP',
+            'akta_perusahaan' => '📘 Akta Pendirian & Perubahan Terakhir',
+            'domisili' => '🏠 Surat Domisili',
+            'sertifikat_halal' => '🕌 Sertifikat Halal',
+            'sertifikat_iso' => '🏅 Sertifikat ISO'
+          ] as $field => $label)
 
+            @php
+              $path = $documents->$field;
+            @endphp
+
+            <tr>
+              <td class="py-3 px-4 font-medium text-blue-200">
+                {{ $label }}
+              </td>
+
+              <td class="py-3 px-4 text-right">
+                @if ($path)
+
+                  {{-- FILE BARU / NORMAL --}}
+                  @if (Storage::disk('public')->exists($path))
+                    <a href="{{ Storage::url($path) }}" target="_blank"
+                       class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600
+                              hover:from-indigo-600 hover:to-blue-700 text-white text-xs font-medium
+                              px-3 py-1.5 rounded-full shadow-md transition-all duration-300 hover:scale-105">
+                      <i data-lucide="eye" class="w-4 h-4"></i>
+                      <span>Lihat Dokumen</span>
+                    </a>
+
+                  {{-- FILE LAMA (LEGACY) --}}
+                  @elseif (Storage::disk('public')->exists('vendor_documents/'.$path))
+                    <a href="{{ Storage::url('vendor_documents/'.$path) }}" target="_blank"
+                       class="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700
+                              text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-md">
+                      <i data-lucide="eye" class="w-4 h-4"></i>
+                      <span>Lihat Dokumen (lama)</span>
+                    </a>
+
+                  {{-- FILE HILANG --}}
                   @else
-                    <span class="text-gray-400 italic">Belum diupload</span>
+                    <span class="text-red-300 italic text-xs">
+                      File tidak ditemukan
+                    </span>
                   @endif
-                </td>
-              </tr>
-            @endforeach
+
+                @else
+                  <span class="text-gray-400 italic text-xs">
+                    Belum diupload
+                  </span>
+                @endif
+              </td>
+            </tr>
+          @endforeach
 
           </tbody>
         </table>
       </div>
 
       <div class="mt-6 text-center">
-        <a href="{{ route('vendor.documents.create') }}" 
+        <a href="{{ route('vendor.documents.create') }}"
            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-5 rounded-xl shadow-md transition">
-           ✏️ Perbarui Dokumen
+          ✏️ Perbarui Dokumen
         </a>
       </div>
     @endif
 
   </div>
 </div>
+
+<script>
+  lucide.createIcons();
+</script>
 @endsection

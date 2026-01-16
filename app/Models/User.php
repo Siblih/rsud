@@ -39,10 +39,11 @@ class User extends Authenticatable
         return $this->belongsTo(Unit::class);
     }
 
-    public function vendorProfile()
-    {
-        return $this->hasOne(VendorProfile::class, 'user_id');
-    }
+   public function vendorProfile()
+{
+    return $this->hasOne(VendorProfile::class, 'user_id');
+}
+
 
     public function vendorDocuments()
     {

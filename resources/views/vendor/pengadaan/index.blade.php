@@ -39,7 +39,8 @@
 
                 <div class="text-sm text-blue-100">
                     <p>📅 Batas Penawaran: <span class="font-semibold text-white">
-                        {{ \Carbon\Carbon::parse($item->batas_penawaran)->translatedFormat('d M Y H:i') }}
+                        {{ $pengadaan->batas_penawaran?->translatedFormat('d M Y H:i') ?? '-' }}
+
                     </span></p>
                    <p>
 💰 Estimasi Anggaran:

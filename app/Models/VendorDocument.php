@@ -23,9 +23,10 @@ class VendorDocument extends Model
     'file_path',
 ];
 
-   public function vendorProfile()
-{
-    return $this->belongsTo(VendorProfile::class, 'user_id');
-}
+  public function vendorProfile()
+    {
+        return $this->belongsTo(VendorProfile::class, 'vendor_profile_id');
+    }
+
 
 }
