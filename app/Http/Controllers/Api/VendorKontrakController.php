@@ -89,10 +89,12 @@ class VendorKontrakController extends Controller
 
     public function upload(Request $request, $id)
 {
+    // 🔐 Pastikan kontrak milik vendor yang login
     $kontrak = Kontrak::where('vendor_id', auth()->id())
         ->where('id', $id)
         ->firstOrFail();
 
+    // 📄 Field dokumen yang diizinkan
     $fields = [
         'po_signed',
         'bast_signed',
@@ -101,29 +103,38 @@ class VendorKontrakController extends Controller
         'surat_permohonan',
     ];
 
+    // 🗂 Ambil dokumen lama (JSON / array)
+    $dokumen = $kontrak->dokumen ?? [];
+
     foreach ($fields as $field) {
         if ($request->hasFile($field)) {
 
-            // hapus file lama
-            if ($kontrak->$field) {
-                Storage::disk('public')->delete($kontrak->$field);
+            // 🧹 Hapus file lama kalau ada
+            if (!empty($dokumen[$field]) && Storage::disk('public')->exists($dokumen[$field])) {
+                Storage::disk('public')->delete($dokumen[$field]);
             }
 
-            // simpan file baru
-            $path = $request->file($field)
-                ->store("vendor_documents/kontrak_{$kontrak->id}", 'public');
+            // 💾 Simpan file baru
+            $path = $request->file($field)->store(
+                "kontrak/{$kontrak->id}",
+                'public'
+            );
 
-            $kontrak->$field = $path;
+            // 🧾 Simpan path ke array dokumen
+            $dokumen[$field] = $path;
         }
     }
 
-    $kontrak->status_pembayaran = 'process';
+    // 🧠 Simpan ke DB (JSON)
+    $kontrak->dokumen = $dokumen;
     $kontrak->save();
 
     return response()->json([
         'success' => true,
-        'message' => 'Dokumen berhasil diupload',
+        'message' => 'Dokumen kontrak berhasil diupload',
+        'data' => $kontrak,
     ]);
 }
+
 
 }

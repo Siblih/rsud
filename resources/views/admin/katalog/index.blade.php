@@ -112,8 +112,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 @foreach ($products as $p)
-                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-3 cursor-pointer"
-     onclick="window.location.href='{{ route('admin.katalog.detail', $p->id) }}'">
+               <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-3 cursor-pointer"
+     onclick="window.location.href='{{ route('admin.katalog.detail', [
+        'id' => $p->id,
+        'pengadaan' => request('pengadaan')
+     ]) }}'">
 
     {{-- FOTO PRODUK --}}
     <div class="relative w-full h-40 rounded-lg overflow-hidden bg-gray-100">

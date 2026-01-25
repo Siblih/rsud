@@ -63,17 +63,11 @@
         <span>Verifikasi</span>
     </a>
 
-    {{-- 🛒 Katalog --}}
+{{-- 🛒 Katalog --}}
     <a href="{{ route('admin.katalog') }}"
-       class="flex flex-col items-center text-[11px] {{ request()->routeIs('admin.katalog*') ? 'text-blue-300 font-semibold' : 'text-white hover:text-blue-200' }}">
-        <i data-lucide="shopping-bag" class="w-5 h-5 mb-0.5"></i>
-        <span>Katalog</span>
-    </a>
-{{-- ⚙️ Pengaturan (Tombol Tengah) --}}
-    <a href="{{ route('admin.pengaturan') }}"
        class="relative -top-3 bg-white text-blue-600 rounded-full p-3 shadow-lg border-4 border-white/30 flex flex-col items-center justify-center hover:scale-105 transition">
-        <i data-lucide="settings" class="w-5 h-5 mb-0.5"></i>
-        <span class="text-[10px] font-medium mt-0.5">Pengaturan</span>
+        <i data-lucide="shopping-bag" class="w-5 h-5 mb-0.5"></i>
+        <span class="text-[10px] font-medium mt-0.5">Katalog</span>
     </a>
     {{-- 📦 Pengadaan --}}
     <a href="{{ route('admin.pengadaan') }}"

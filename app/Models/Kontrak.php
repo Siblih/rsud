@@ -71,4 +71,9 @@ class Kontrak extends Model
             ? $this->tanggal_kontrak->format('d M Y')
             : '-';
     }
+    public function penawaran()
+{
+    return $this->belongsTo(Penawaran::class);
+}
+
 }

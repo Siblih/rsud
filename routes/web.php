@@ -22,13 +22,6 @@ use App\Http\Controllers\Vendor\VendorKontrakController;
 use App\Http\Controllers\Vendor\PaymentController;
 use App\Http\Controllers\Admin\AdminPenawaranController;
 
-
-
-
-
-
-
-
 use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\PengadaanController as AdminPengadaanController;
@@ -36,6 +29,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\LogActivityController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\KatalogController;
+use App\Http\Controllers\Admin\AdminBastController;
 
 
 
@@ -90,6 +84,10 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('/verifikasi/{id}/setujui', [VerifikasiController::class, 'setujui'])->name('verifikasi.setujui');
         Route::post('/verifikasi/{id}/tolak', [VerifikasiController::class, 'tolak'])->name('verifikasi.tolak');
 
+        Route::post('/pengadaan/{id}/metode',
+    [AdminPengadaanController::class, 'setMetode']
+)->name('pengadaan.setMetode');
+
         // Data Vendor (dashboard shortcut)
 Route::get('/admin/vendor/data-vendor', [VendorController::class, 'dataVendor'])
     ->name('vendor.data_vendor');
@@ -99,6 +97,13 @@ Route::get('/admin/vendor/data-vendor', [VendorController::class, 'dataVendor'])
 Route::get('/admin/vendor/{id}/documents', 
     [VendorController::class, 'documents']
 )->name('vendor.documents');
+Route::get('/bast/{id}', [AdminBastController::class, 'show'])
+    ->name('bast.show');
+
+Route::post('/bast/{id}', [AdminBastController::class, 'upload'])
+    ->name('bast.upload');
+
+
 
 Route::post('/admin/pengadaan/{id}/update-status', [PengadaanController::class, 'updateStatus'])->name('admin.pengadaan.updateStatus');
 
@@ -111,8 +116,11 @@ Route::post('/admin/pengadaan/{id}/update-status', [PengadaanController::class, 
         ->name('penawaran.show');
 
     // 🏆 Pilih pemenang
-    Route::post('/penawaran/{penawaran}/menang', [AdminPenawaranController::class, 'setPemenang'])
-        ->name('penawaran.menang');
+    Route::post(
+    '/penawaran/{id}/pemenang',
+    [AdminPengadaanController::class, 'setPemenang']
+)->name('penawaran.setPemenang');
+
 
 
         // ======================
@@ -151,6 +159,9 @@ Route::get('kontrak/create/{pengadaan}', [KontrakController::class, 'create'])
        Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
        Route::get('/katalog/{id}', [KatalogController::class, 'detail'])
     ->name('katalog.detail');
+Route::post('/katalog/{product}/beli-langsung/{pengadaan}',
+            [KatalogController::class, 'beliLangsung']
+        )->name('katalog.beliLangsung');
 
 Route::get('/katalog/{id}/vendor', [KatalogController::class, 'vendorShow'])
     ->name('katalog.show');
@@ -269,35 +280,4 @@ Route::post('/vendor/po/{id}/sign', [VendorPurchaseOrderController::class, 'sign
 });
 
 
-Route::middleware(['auth', 'role:evaluator'])->group(function () {
-    Route::get('/evaluator/dashboard', fn() => view('dashboards.evaluator'))->name('evaluator.dashboard');
-});
 
-// =======================
-// Resource tambahan (umum)
-// =======================
-Route::middleware(['auth'])->group(function () {
-    // Jika butuh resource CRUD pengadaan umum
-    Route::resource('pengadaan', PengadaanController::class)->except(['create', 'store']);
-});
-
-Route::middleware(['auth', 'role:ppk'])->prefix('ppk')->name('ppk.')->group(function () {
-    Route::get('/dashboard', function(){ return view('ppk.dashboard'); })->name('dashboard');
-});
-Route::middleware(['auth', 'role:pejabat_pengadaan'])
-    ->prefix('pejabat')->name('pejabat.')
-    ->group(function () {
-        Route::get('/dashboard', function(){ return view('pejabat.dashboard'); })->name('dashboard');
-    });
-Route::middleware(['auth', 'role:panitia_pengadaan'])
-    ->prefix('panitia')->name('panitia.')
-    ->group(function () {
-        Route::get('/dashboard', function(){ return view('panitia.dashboard'); })->name('dashboard');
-    });
-Route::middleware(['auth', 'role:auditor'])
-    ->prefix('auditor')->name('auditor.')
-    ->group(function () {
-        Route::get('/dashboard', function(){ return view('auditor.dashboard'); })->name('dashboard');
-        Route::get('/log', [LogController::class, 'index'])->name('log');
-        Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
-    });

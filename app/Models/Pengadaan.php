@@ -29,6 +29,7 @@ class Pengadaan extends Model
         'uraian_pekerjaan',
         'lokasi_pekerjaan',
         'approved_at', // 🔥 sumber utama timeline
+        'metode_pengadaan', 
     ];
 
     /* =========================
@@ -135,4 +136,9 @@ class Pengadaan extends Model
         return $this->kode_tender
             ?? 'TDR-' . date('Y') . '-' . str_pad($this->id, 5, '0', STR_PAD_LEFT);
     }
+    public function penawaran()
+{
+    return $this->hasMany(Penawaran::class);
+}
+
 }

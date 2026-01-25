@@ -63,7 +63,7 @@
                             <td class="p-3 border border-white/10 text-center">
                                 @if($p->status !== 'menang' && $pengadaan->status !== 'selesai')
                                     <form method="POST"
-                                          action="{{ route('admin.penawaran.menang', $p->id) }}"
+                                          action="{{ route('admin.penawaran.setPemenang', $p->id) }}"
                                           onsubmit="return confirm('Yakin pilih vendor ini sebagai pemenang?')">
                                         @csrf
                                         <button
@@ -74,14 +74,22 @@
                                         </button>
                                     </form>
                                 @elseif($p->status === 'menang')
-                                    <span class="text-green-300 font-semibold">
-                                        🏆 Pemenang
-                                    </span>
-                                @else
-                                    <span class="text-xs text-blue-200 italic">
-                                        Dikunci
-                                    </span>
-                                @endif
+    <div class="flex justify-center items-center gap-2">
+
+        <span class="text-green-300 font-semibold">
+            🏆 Pemenang
+        </span>
+
+        <a href="{{ route('admin.kontrak.create', $pengadaan->id) }}?tab=kontrak"
+           class="bg-blue-600/80 hover:bg-blue-700
+                  text-white text-xs px-3 py-1
+                  rounded-full font-semibold shadow transition">
+            📄 Ke Kontrak
+        </a>
+
+    </div>
+@endif
+
                             </td>
                         </tr>
                     @empty

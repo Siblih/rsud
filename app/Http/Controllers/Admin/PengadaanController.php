@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengadaan;
 use App\Models\Kontrak;
 use App\Models\PurchaseOrder;
+use App\Models\Penawaran;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-
+use Illuminate\Support\Facades\DB;
 
 class PengadaanController extends Controller
 {
@@ -17,71 +17,84 @@ class PengadaanController extends Controller
      * HALAMAN UTAMA ADMIN
      * =========================
      */
-    public function index(Request $request)
-    {
-        $activeTab = $request->get('tab', 'paket');
+   public function index(Request $request)
+{
+    $activeTab = $request->get('tab', 'paket');
 
-        /**
-         * =========================
-         * TAB PAKET
-         * =========================
-         */
-        $pengadaans = Pengadaan::with('unit')
-            ->when($request->status, fn ($q) =>
-                $q->where('status', $request->status)
+    /**
+     * =========================
+     * TAB PAKET
+     * =========================
+     */
+    $pengadaans = Pengadaan::with('unit')
+        ->when($request->status, fn ($q) =>
+            $q->where('status', $request->status)
+        )
+        ->when($request->nama, fn ($q) =>
+            $q->where('nama_pengadaan', 'like', '%' . $request->nama . '%')
+        )
+        ->when($request->unit, fn ($q) =>
+            $q->whereHas('unit', fn ($u) =>
+                $u->where('name', 'like', '%' . $request->unit . '%')
             )
-            ->when($request->nama, fn ($q) =>
-                $q->where('nama_pengadaan', 'like', '%' . $request->nama . '%')
-            )
-            ->when($request->unit, fn ($q) =>
-                $q->whereHas('unit', fn ($u) =>
-                    $u->where('name', 'like', '%' . $request->unit . '%')
-                )
-            )
-            ->latest()
-            ->get();
+        )
+        ->latest()
+        ->get();
 
-        /**
-         * =========================
-         * TAB KONTRAK
-         * =========================
-         */
-        $kontraks = Kontrak::with(['pengadaan', 'vendor'])
-            ->when($request->status && $activeTab === 'kontrak', fn ($q) =>
-                $q->where('status', $request->status)
-            )
-            ->when($request->nomor_kontrak, fn ($q) =>
-                $q->where('nomor_kontrak', 'like', '%' . $request->nomor_kontrak . '%')
-            )
-            ->when($request->pengadaan_nama, fn ($q) =>
-                $q->whereHas('pengadaan', fn ($p) =>
-                    $p->where('nama_pengadaan', 'like', '%' . $request->pengadaan_nama . '%')
-                )
-            )
-            ->when($request->vendor_nama, fn ($q) =>
-                $q->whereHas('vendor', fn ($v) =>
-                    $v->where('name', 'like', '%' . $request->vendor_nama . '%')
-                )
-            )
-            ->latest()
-            ->get();
+    /**
+     * =========================
+     * TAB KONTRAK
+     * =========================
+     */
+    $kontraks = Kontrak::with([
+            'pengadaan',
+            'vendor.vendorProfile'
+        ])
+        ->latest()
+        ->get();
 
-        /**
-         * =========================
-         * TAB PURCHASE ORDER
-         * =========================
-         */
-        $poList = PurchaseOrder::with(['kontrak', 'vendor'])
-            ->latest()
-            ->get();
+    /**
+     * =========================
+     * TAB PURCHASE ORDER
+     * =========================
+     */
+    $poList = PurchaseOrder::with([
+            'kontrak.pengadaan',
+            'vendor'
+        ])
+        ->latest()
+        ->get();
 
-        return view('admin.pengadaan.index', compact(
-            'pengadaans',
-            'kontraks',
-            'poList',
-            'activeTab'
-        ));
-    }
+    /**
+     * =========================
+     * TAB BAST ✅ (LOGIKA BENAR)
+     * =========================
+     * - TANPA model/tabel BAST
+     * - Ambil dari:
+     *   Pengadaan -> Penawaran (MENANG) -> Kontrak -> PO
+     */
+    $bastList = Pengadaan::with([
+            'unit',
+            'penawarans' => fn ($q) =>
+                $q->where('status', 'menang')
+                  ->with('vendor.vendorProfile'),
+            'kontraks.purchaseOrders'
+        ])
+        ->where('metode_pengadaan', 'kompetisi')
+        ->whereHas('penawarans', fn ($q) =>
+            $q->where('status', 'menang')
+        )
+        ->latest()
+        ->get();
+
+    return view('admin.pengadaan.index', compact(
+        'pengadaans',
+        'kontraks',
+        'poList',
+        'bastList',
+        'activeTab'
+    ));
+}
 
     /**
      * =========================
@@ -101,27 +114,26 @@ class PengadaanController extends Controller
 
     /**
      * =========================
-     * UPDATE STATUS (APPROVE / REJECT)
+     * SET PEMENANG PENGADAAN
      * =========================
      */
- public function updateStatus(Request $request, $id)
-{
-    $pengadaan = Pengadaan::findOrFail($id);
+    public function setPemenang($penawaranId)
+    {
+        $penawaran = Penawaran::with('pengadaan')->findOrFail($penawaranId);
 
-    $pengadaan->status = $request->status;
+        DB::transaction(function () use ($penawaran) {
 
-    if ($request->status === 'disetujui') {
-        $pengadaan->keterangan = 'Disetujui oleh Admin';
+            Penawaran::where('pengadaan_id', $penawaran->pengadaan_id)
+                ->update(['status' => 'kalah']);
+
+            $penawaran->update(['status' => 'menang']);
+
+            $penawaran->pengadaan->update([
+                'status' => 'disetujui',
+                'proses' => 'selesai'
+            ]);
+        });
+
+        return back()->with('success', 'Pemenang berhasil ditetapkan');
     }
-
-    if ($request->status === 'ditolak') {
-        $pengadaan->keterangan = 'Ditolak oleh Admin';
-    }
-
-    $pengadaan->save();
-
-    return back(); // langsung reload halaman
-}
-
-
 }

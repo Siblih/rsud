@@ -61,20 +61,49 @@
             {{-- JUMLAH --}}
             <label class="font-semibold text-sm text-gray-700">Jumlah</label>
             <div class="flex items-center gap-3 mt-2 mb-5">
-                <button class="px-3 py-1 bg-gray-200 text-gray-700 rounded">-</button>
-                <input type="number" value="1"
-                       class="border border-gray-300 bg-white text-gray-800 px-3 py-1 w-20 rounded text-center">
-                <button class="px-3 py-1 bg-gray-200 text-gray-700 rounded">+</button>
-            </div>
+    <button type="button"
+            onclick="kurangQty()"
+            class="px-3 py-1 bg-gray-200 text-gray-700 rounded">
+        -
+    </button>
+
+    <input type="number"
+           id="qty"
+           name="qty"
+           value="1"
+           min="1"
+           class="border border-gray-300 bg-white text-gray-800 px-3 py-1 w-20 rounded text-center">
+
+    <button type="button"
+            onclick="tambahQty()"
+            class="px-3 py-1 bg-gray-200 text-gray-700 rounded">
+        +
+    </button>
+</div>
+
 
             {{-- TOMBOL --}}
-            <button class="w-full bg-orange-600 text-white py-2 rounded-lg font-semibold mb-3">
-                + Tambah Keranjang
-            </button>
+          @php
+$pengadaanId = request('pengadaan');
+@endphp
 
-            <button class="w-full bg-red-600 text-white py-2 rounded-lg font-semibold">
-                Beli Langsung
-            </button>
+@if ($pengadaanId)
+<form method="POST"
+      action="{{ route('admin.katalog.beliLangsung', [
+          'product' => $product->id,
+          'pengadaan' => $pengadaanId
+      ]) }}">
+    @csrf
+
+    <button class="w-full bg-red-600 text-white py-2 rounded-lg font-semibold">
+        Pilih Produk
+    </button>
+</form>
+@else
+<div class="bg-red-100 text-red-700 p-3 rounded text-sm">
+    Produk hanya bisa dipilih dari menu Pengadaan
+</div>
+@endif
 
         </div>
 
@@ -223,3 +252,16 @@
 
 </div>
 @endsection
+<script>
+function tambahQty() {
+    const qty = document.getElementById('qty');
+    qty.value = parseInt(qty.value || 1) + 1;
+}
+
+function kurangQty() {
+    const qty = document.getElementById('qty');
+    if (parseInt(qty.value) > 1) {
+        qty.value = parseInt(qty.value) - 1;
+    }
+}
+</script>

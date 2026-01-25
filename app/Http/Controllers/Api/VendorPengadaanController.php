@@ -49,6 +49,43 @@ class VendorPengadaanController extends Controller
             'data' => $pengadaans,
         ]);
     }
+public function storePenawaran(Request $request, $id)
+{
+    $request->validate([
+        'harga' => 'required|numeric|min:1',
+    ]);
+
+    $vendorId = $request->user()->id;
+
+    $pengadaan = Pengadaan::where('status', 'disetujui')
+        ->findOrFail($id);
+
+    $penawaran = $pengadaan->penawarans()
+        ->where('vendor_id', $vendorId)
+        ->first();
+
+    if ($penawaran) {
+        // UPDATE → pastikan status valid ENUM
+        $penawaran->update([
+            'harga' => $request->harga,
+            'status' => 'pending',
+            'file_penawaran' => null,
+        ]);
+    } else {
+        // CREATE → status FIX pending
+        $pengadaan->penawarans()->create([
+            'vendor_id' => $vendorId,
+            'harga' => $request->harga,
+            'status' => 'pending',
+            'file_penawaran' => null,
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Penawaran berhasil dikirim',
+    ]);
+}
 
     /* =========================
      | SHOW (DETAIL)
