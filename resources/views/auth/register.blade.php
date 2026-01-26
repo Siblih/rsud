@@ -23,6 +23,17 @@
 
     <h3 class="text-center text-lg font-semibold mb-4">Daftar sebagai Vendor</h3>
     <p class="text-center text-sm text-gray-500 mb-6">Silakan isi data di bawah untuk mendaftar.</p>
+@if(session('success'))
+    <div class="bg-green-500 text-white px-4 py-2 rounded mb-4 text-center">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if($errors->any())
+    <div class="bg-red-500 text-white px-4 py-2 rounded mb-4 text-center">
+        {{ $errors->first() }}
+    </div>
+@endif
 
     <form method="POST" action="/register" class="space-y-4">
       @csrf

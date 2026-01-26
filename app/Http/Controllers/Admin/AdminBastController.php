@@ -35,10 +35,22 @@ class AdminBastController extends Controller
     }
 public function show($id)
 {
-    $kontrak = Kontrak::with('pengadaan')->findOrFail($id);
+    $kontrak = Kontrak::with(['pengadaan'])->findOrFail($id);
 
-    return view('admin.bast.upload', compact('kontrak'));
+    $fields = [
+        'bast_file'          => 'Berita Acara Serah Terima (BAST)',
+        'invoice'            => 'Invoice',
+        'kwitansi'           => 'Kwitansi',
+        'faktur_pajak'       => 'Faktur Pajak',
+        'surat_jalan'        => 'Surat Jalan',
+    ];
+
+    return view('admin.bast.upload', compact(
+        'kontrak',
+        'fields'
+    ));
 }
+
 
     /**
      * 🔁 INDEX (JIKA DIAKSES LANGSUNG, REDIRECT KE TAB)

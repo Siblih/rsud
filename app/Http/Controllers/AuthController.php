@@ -20,24 +20,24 @@ class AuthController extends Controller
     }
 
     public function register(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|unique:users',
-        'password' => 'required|string|min:6|confirmed',
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
 
-    // Role otomatis vendor
-    User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'role' => 'vendor',
-    ]);
+        // Role otomatis vendor
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'vendor',
+        ]);
 
-    return redirect('/login')->with('success', 'Registrasi berhasil! Akun vendor Anda menunggu verifikasi admin.');
-}
-
+        // Redirect ke login dengan notifikasi sukses
+        return redirect('/login')->with('success', 'Registrasi berhasil! Akun vendor Anda menunggu verifikasi admin.');
+    }
 
     public function login(Request $request)
     {
@@ -45,6 +45,9 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
+
+            // Flash message untuk login sukses
+            $request->session()->flash('success', 'Login berhasil! Selamat datang, ' . $user->name);
 
             switch ($user->role) {
                 case 'admin':
@@ -64,6 +67,6 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect('/login');
+        return redirect('/login')->with('success', 'Berhasil logout');
     }
 }

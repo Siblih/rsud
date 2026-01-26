@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\LogActivityController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\KatalogController;
 use App\Http\Controllers\Admin\AdminBastController;
+use App\Http\Controllers\Admin\AdminPembayaranController; 
 
 
 
@@ -75,6 +76,26 @@ Route::middleware(['auth', 'role:admin'])
 
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/pembayaran',
+        [AdminPembayaranController::class, 'index']
+    )->name('pembayaran.index');
+
+    Route::get('/pembayaran/{id}',
+        [AdminPembayaranController::class, 'show']
+    )->name('pembayaran.show');
+
+    Route::post('/pembayaran/{po}/upload',
+        [AdminPembayaranController::class, 'uploadBukti']
+    )->name('pembayaran.upload');
+
+    Route::get('/pembayaran/bukti/{id}',
+        [AdminPembayaranController::class, 'downloadBukti']
+    )->name('pembayaran.downloadBukti');
+
+    Route::delete('/pembayaran/{id}',
+        [AdminPembayaranController::class, 'destroy']
+    )->name('pembayaran.destroy');
+
 
         // ======================
         // VERIFIKASI VENDOR
@@ -104,13 +125,9 @@ Route::post('/bast/{id}', [AdminBastController::class, 'upload'])
     ->name('bast.upload');
 
 
-
-Route::post('/admin/pengadaan/{id}/update-status', [PengadaanController::class, 'updateStatus'])->name('admin.pengadaan.updateStatus');
-
 // 📋 List pengadaan yang punya penawaran
     Route::get('/penawaran', [AdminPenawaranController::class, 'index'])
         ->name('penawaran.index');
-
     // 🔍 Detail penawaran per pengadaan
     Route::get('/penawaran/{pengadaan}', [AdminPenawaranController::class, 'show'])
         ->name('penawaran.show');
@@ -120,7 +137,6 @@ Route::post('/admin/pengadaan/{id}/update-status', [PengadaanController::class, 
     '/penawaran/{id}/pemenang',
     [AdminPengadaanController::class, 'setPemenang']
 )->name('penawaran.setPemenang');
-
 
 
         // ======================
@@ -135,9 +151,6 @@ Route::post('/admin/pengadaan/{id}/update-status', [PengadaanController::class, 
         Route::post('/verifikasi/produk/{id}/tolak', [VerifikasiController::class, 'rejectProduk'])
             ->name('verifikasi.produk.tolak');
 
-Route::post('/admin/pengadaan/{id}/status', 
-    [AdminPengadaanController::class, 'updateStatus']
-)->name('admin.pengadaan.updateStatus');
 Route::get('kontrak/create/{pengadaan}', [KontrakController::class, 'create'])
         ->name('kontrak.create');
 

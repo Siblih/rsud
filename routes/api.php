@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\VendorAccountController;
 use App\Http\Controllers\Api\VendorDocumentController;
 use App\Http\Controllers\Api\AdminVerifikasiApiController;
 use App\Http\Controllers\Api\AdminKatalogController;
+use App\Http\Controllers\Api\PengadaanAdminController;
+
 
 
 /*
@@ -77,7 +79,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/produk/{id}/approve', [AdminVerifikasiApiController::class, 'approveProduk']);
         Route::post('/produk/{id}/reject', [AdminVerifikasiApiController::class, 'rejectProduk']);
 
-       
+       Route::get('/pengadaan', [PengadaanAdminController::class, 'index']);
+    Route::get('/pengadaan/{id}', [PengadaanAdminController::class, 'show']);
+    Route::post('/pengadaan/{id}/update-status', [PengadaanAdminController::class, 'updateStatus']);
+
 
     });
 });

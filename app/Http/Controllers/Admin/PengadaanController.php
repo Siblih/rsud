@@ -20,6 +20,19 @@ class PengadaanController extends Controller
    public function index(Request $request)
 {
     $activeTab = $request->get('tab', 'paket');
+/**
+ * =========================
+ * TAB PEMBAYARAN 💰
+ * =========================
+ */
+$pembayaranList = PurchaseOrder::with([
+        'kontrak.pengadaan',
+        'vendor',
+        'pembayaran'
+    ])
+    
+    ->latest()
+    ->get();
 
     /**
      * =========================
@@ -40,6 +53,7 @@ class PengadaanController extends Controller
         )
         ->latest()
         ->get();
+        
 
     /**
      * =========================
@@ -74,26 +88,63 @@ class PengadaanController extends Controller
      *   Pengadaan -> Penawaran (MENANG) -> Kontrak -> PO
      */
     $bastList = Pengadaan::with([
-            'unit',
-            'penawarans' => fn ($q) =>
-                $q->where('status', 'menang')
-                  ->with('vendor.vendorProfile'),
-            'kontraks.purchaseOrders'
-        ])
-        ->where('metode_pengadaan', 'kompetisi')
-        ->whereHas('penawarans', fn ($q) =>
-            $q->where('status', 'menang')
-        )
-        ->latest()
-        ->get();
+    'unit',
+    'penawarans' => fn ($q) =>
+        $q->where('status', 'menang')
+          ->with('vendor.vendorProfile'),
+    'kontraks.purchaseOrders.pembayaran' // tetap ambil relasi pembayaran
+])
+->where('metode_pengadaan', 'kompetisi')
+->whereHas('penawarans', fn ($q) =>
+    $q->where('status', 'menang')
+)
+->latest()
+->get();
+
 
     return view('admin.pengadaan.index', compact(
         'pengadaans',
         'kontraks',
         'poList',
         'bastList',
+        'pembayaranList', 
         'activeTab'
     ));
+}
+public function setMetode(Request $request, $id)
+{
+    $request->validate([
+        'metode_pengadaan' => 'required|in:langsung,kompetisi'
+    ]);
+
+    $pengadaan = Pengadaan::findOrFail($id);
+
+    $pengadaan->update([
+        'status' => 'disetujui',
+        'metode_pengadaan' => $request->metode_pengadaan
+    ]);
+
+    return back()->with('success', 'Metode pengadaan ditetapkan');
+}
+
+/**
+ * =========================
+ * UPDATE STATUS PENGADAAN
+ * =========================
+ */
+public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|in:disetujui,ditolak',
+    ]);
+
+    $pengadaan = Pengadaan::findOrFail($id);
+
+    $pengadaan->update([
+        'status' => $request->status,
+    ]);
+
+    return back()->with('success', 'Status pengadaan berhasil diperbarui');
 }
 
     /**

@@ -13,7 +13,7 @@
 
     {{-- 🔹 Tab Navigasi --}}
     @php
-        $tabs = ['paket' => 'Paket', 'kontrak' => 'Kontrak', 'po' => 'Purchase Order', 'BAST' => 'BAST'];
+        $tabs = ['paket' => 'Paket', 'kontrak' => 'Kontrak', 'po' => 'Purchase Order', 'BAST' => 'BAST', 'pembayaran' => 'Pembayaran'];
         $activeTab = request()->get('tab', 'paket');
     @endphp
 
@@ -95,18 +95,66 @@
 
 {{-- SETUJUI / TOLAK --}}
 @if ($p->status === 'menunggu')
-<form method="POST" action="{{ route('admin.pengadaan.updateStatus',$p->id) }}">
-    @csrf
-    <input type="hidden" name="status" value="disetujui">
-    <button class="px-2 py-1 bg-green-500/20 rounded text-xs">Setujui</button>
-</form>
 
-<form method="POST" action="{{ route('admin.pengadaan.updateStatus',$p->id) }}">
-    @csrf
-    <input type="hidden" name="status" value="ditolak">
-    <button class="px-2 py-1 bg-red-500/20 rounded text-xs">Tolak</button>
-</form>
+    {{-- SETUJUI (BUKA PILIHAN METODE) --}}
+    <button
+        onclick="openMetodeModal({{ $p->id }})"
+        class="px-2 py-1 bg-green-500/20 rounded text-xs">
+        Setujui
+    </button>
+
+    {{-- TOLAK --}}
+    <form method="POST"
+          action="{{ route('admin.pengadaan.updateStatus',$p->id) }}"
+          class="inline-block">
+        @csrf
+        <input type="hidden" name="status" value="ditolak">
+        <button class="px-2 py-1 bg-red-500/20 rounded text-xs">
+            Tolak
+        </button>
+    </form>
+
 @endif
+{{-- MODAL PILIH METODE --}}
+<div id="metodeModal"
+     class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+
+    <div class="bg-[#1A1F4A] rounded-xl p-6 w-96 text-white shadow-lg">
+        <h2 class="text-lg font-semibold mb-4 text-center">
+            Pilih Metode Pengadaan
+        </h2>
+
+        <div class="flex gap-4 justify-center">
+
+            {{-- KOMPETISI --}}
+            <form method="POST" id="formKompetisi">
+                @csrf
+                <input type="hidden" name="metode_pengadaan" value="kompetisi">
+                <button
+                    class="px-4 py-2 bg-purple-600/80 rounded w-full">
+                    Kompetisi (Tender)
+                </button>
+            </form>
+
+            {{-- LANGSUNG --}}
+            <form method="POST" id="formLangsung">
+                @csrf
+                <input type="hidden" name="metode_pengadaan" value="langsung">
+                <button
+                    class="px-4 py-2 bg-orange-600/80 rounded w-full">
+                    Langsung
+                </button>
+            </form>
+
+        </div>
+
+        <button onclick="closeMetodeModal()"
+                class="mt-4 w-full text-sm text-white/70 hover:underline">
+            Batal
+        </button>
+    </div>
+</div>
+
 
 {{-- METODE PENGADAAN --}}
 @if ($p->status === 'disetujui')
@@ -431,9 +479,10 @@
     $vendor = $penawaran?->vendor;
 
     // 🔥 Status BAST (virtual)
-    $statusBast = $kontrak && $kontrak->status_pembayaran === 'diproses'
-        ? 'disetujui'
-        : 'menunggu';
+    $statusBast = $kontrak?->status_bast ?? 'disetujui';
+
+        $pembayaran = $po?->pembayaran;
+
 @endphp
 
 
@@ -484,12 +533,53 @@
         </td>
 
         {{-- AKSI --}}
-        <td class="p-2 border border-white/10 text-center">
-            <a href="{{ route('admin.bast.show', $kontrak->id) }}"
-               class="px-3 py-1 bg-blue-600/30 rounded-full text-xs hover:bg-blue-600/50">
-                Lihat BAST
-            </a>
-        </td>
+      <td class="p-2 border border-white/10 text-center space-y-1">
+
+    {{-- 🔥 TOMBOL LIHAT BAST (WAJIB ADA) --}}
+    @if ($kontrak)
+        <a href="{{ route('admin.bast.upload', $kontrak->id) }}"
+           class="block px-3 py-1 bg-blue-600/30 rounded text-xs hover:bg-blue-600/50">
+            Lihat BAST
+        </a>
+    @endif
+
+    {{-- 🔥 STATUS PEMBAYARAN --}}
+    @if ($pembayaran && $pembayaran->bukti_bayar)
+        {{-- ✅ SUDAH UPLOAD --}}
+        <span class="block text-xs text-green-300 mt-1 font-semibold">
+            Sudah Dibayar
+        </span>
+
+        <a href="{{ asset('storage/'.$pembayaran->bukti_bayar) }}"
+           target="_blank"
+           class="block px-3 py-1 bg-emerald-600/30 rounded text-xs hover:bg-emerald-600/50">
+            Lihat Bukti
+        </a>
+    @else
+        {{-- ❌ BELUM UPLOAD --}}
+        <form action="{{ route('admin.pembayaran.upload', $po->id) }}"
+              method="POST"
+              enctype="multipart/form-data"
+              class="flex flex-col gap-1 mt-1">
+            @csrf
+
+            <input type="file"
+                   name="bukti_bayar"
+                   required
+                   class="text-xs text-white">
+
+            <button type="submit"
+                    class="px-3 py-1 bg-green-600/30 rounded text-xs hover:bg-green-600/50">
+                Upload Bukti
+            </button>
+        </form>
+    @endif
+
+</td>
+
+
+
+
     </tr>
 
 @empty
@@ -504,6 +594,114 @@
 </table>
 </div>
 
+@elseif ($activeTab === 'pembayaran')
+{{-- TAB PEMBAYARAN --}}
+<h2 class="font-semibold mb-3 flex items-center gap-2 text-blue-200">
+    <i data-lucide="wallet" class="w-5 h-5"></i>
+    Daftar Pembayaran
+</h2>
+
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-white/90 border-collapse">
+    <thead class="bg-white/20">
+        <tr>
+            <th class="p-2 border border-white/10">#</th>
+            <th class="p-2 border border-white/10 text-left">Pengadaan</th>
+            <th class="p-2 border border-white/10 text-left">Vendor</th>
+            <th class="p-2 border border-white/10 text-left">No Kontrak</th>
+            <th class="p-2 border border-white/10 text-left">No PO</th>
+            <th class="p-2 border border-white/10 text-right">Nilai</th>
+            <th class="p-2 border border-white/10 text-center">Status Pembayaran</th>
+            <th class="p-2 border border-white/10 text-center">Aksi</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    @forelse ($pembayaranList as $i => $po)
+
+       @php
+    $kontrak    = $po->kontrak ?? null;
+    $pengadaan  = $kontrak?->pengadaan;
+    $pembayaran = $po->pembayaran;
+
+    $penawaran = $pengadaan?->penawarans
+        ?->where('status', 'menang')
+        ->first();
+
+    $vendor = $penawaran?->vendor;
+@endphp
+
+
+
+        <tr class="hover:bg-white/10 transition">
+            <td class="p-2 border border-white/10 text-center">{{ $i + 1 }}</td>
+
+            <td class="p-2 border border-white/10">
+                {{ $pengadaan?->nama_pengadaan ?? '-' }}
+
+            </td>
+
+            <td class="p-2 border border-white/10">
+               {{ $vendor?->vendorProfile?->company_name ?? '-' }}
+
+            </td>
+
+            <td class="p-2 border border-white/10 text-xs">
+               {{ $kontrak?->nomor_kontrak ?? '-' }}
+
+            </td>
+
+            <td class="p-2 border border-white/10 text-xs">
+               {{ $po->nomor_po }}
+
+            </td>
+
+            <td class="p-2 border border-white/10 text-right">
+               Rp {{ number_format($penawaran?->harga ?? 0, 0, ',', '.') }}
+
+            </td>
+
+            {{-- STATUS PEMBAYARAN --}}
+            <td class="p-2 border border-white/10 text-center">
+    @if ($pembayaran && $pembayaran->status === 'lunas')
+        <span class="px-2 py-1 bg-green-500/20 text-green-300 rounded text-xs">
+            Dibayar
+        </span>
+    @elseif ($pembayaran)
+        <span class="px-2 py-1 bg-yellow-400/20 text-yellow-300 rounded text-xs">
+            Diproses
+        </span>
+    @else
+        <span class="px-2 py-1 bg-gray-500/20 text-gray-300 rounded text-xs">
+            Belum Dibayar
+        </span>
+    @endif
+</td>
+
+
+            {{-- AKSI --}}
+           <td class="p-2 border border-white/10 text-center">
+    @if ($pembayaran && $pembayaran->status === 'lunas')
+        <span class="text-green-300 text-xs">✔ Selesai</span>
+    @else
+    <span class="px-2 py-1 bg-blue-600/30 rounded-full text-xs text-white/80">
+        Proses
+    </span>
+@endif
+
+</td>
+
+        </tr>
+    @empty
+        <tr>
+            <td colspan="8" class="text-center py-4 text-white/60">
+                Belum ada data pembayaran.
+            </td>
+        </tr>
+    @endforelse
+    </tbody>
+</table>
+</div>
 
         
         @endif
@@ -512,5 +710,19 @@
 
 <script>
     lucide.createIcons();
+    function openMetodeModal(pengadaanId) {
+        document.getElementById('metodeModal').classList.remove('hidden');
+
+        document.getElementById('formKompetisi')
+            .action = `/admin/pengadaan/${pengadaanId}/metode`;
+
+        document.getElementById('formLangsung')
+            .action = `/admin/pengadaan/${pengadaanId}/metode`;
+    }
+
+    function closeMetodeModal() {
+        document.getElementById('metodeModal').classList.add('hidden');
+    }
+
 </script>
 @endsection

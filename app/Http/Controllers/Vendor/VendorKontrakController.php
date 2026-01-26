@@ -7,29 +7,57 @@ use App\Models\Kontrak;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use App\Models\Pengadaan;
+
+
 
 
 class VendorKontrakController extends Controller
 {
     public function index()
 {
-    $kontraks = Kontrak::with(['pengadaan', 'vendor'])
-        ->where('vendor_id', Auth::id())
-        ->latest()
-        ->get();
+    $kontraks = Kontrak::with([
+    'purchaseOrders.pembayaran',
+    'pengadaan',
+    'vendor.vendorProfile'
+])
+->where('vendor_id', Auth::id())
+->latest()
+->get();
 
     return view('vendor.kontrak.index', compact('kontraks'));
+}
+public function bast()
+{
+    // Ambil semua pengadaan untuk vendor login dengan kontrak & PO
+    $bastList = Pengadaan::with([
+        'kontraks.purchaseOrders.pembayaran', // 🔥 penting, biar $po->pembayaran ada
+        'penawarans' => fn($q) => $q->where('vendor_id', auth()->id()),
+        'kontraks.vendor.vendorProfile'
+    ])
+    ->whereHas('kontraks.purchaseOrders', fn($q) => 
+        $q->whereHas('pembayaran') // opsional, hanya yg ada PO
+    )
+    ->latest()
+    ->get();
+
+    return view('vendor.pengadaan.bast', compact('bastList'));
 }
 
 
     public function show($id)
-    {
-        $kontrak = Kontrak::with('pengadaan')
-            ->where('vendor_id', Auth::id())
-            ->findOrFail($id);
+{
+    $kontrak = Kontrak::with([
+        'pengadaan',
+        'purchaseOrders.pembayaran',
+        'vendor.vendorProfile'
+    ])
+    ->where('vendor_id', auth()->id())
+    ->findOrFail($id);
 
-        return view('vendor.kontrak.show', compact('kontrak'));
-    }
+    return view('vendor.kontrak.show', compact('kontrak'));
+}
+
 public function uploadForm($id)
     {
         $vendorId = Auth::id();

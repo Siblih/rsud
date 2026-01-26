@@ -134,56 +134,48 @@
   {{-- ========================= --}}
 {{-- 💰 STATUS PEMBAYARAN --}}
 {{-- ========================= --}}
-<div id="pembayaran"
-     class="mt-10 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-xl">
-
+<div id="pembayaran" class="mt-10 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-xl">
     <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-        💳 Status Pembayaran
+        <i data-lucide="credit-card" class="w-5 h-5 text-blue-300"></i>
+        Status Pembayaran
     </h3>
 
-    @if ($kontrak->status_pembayaran === 'paid')
-        {{-- ✅ SUDAH DIBAYAR --}}
-        <div class="flex flex-col gap-3">
-            <span class="inline-block w-fit px-4 py-1 rounded-full text-sm font-semibold
-                         bg-green-400/20 text-green-300">
-                ✅ Sudah Dibayar
-            </span>
+    @forelse ($kontrak->purchaseOrders as $po)
+        @php $pembayaran = $po->pembayaran; @endphp
 
-            @if ($kontrak->bukti_pembayaran)
-                <a href="{{ asset('storage/' . $kontrak->bukti_pembayaran) }}"
-                   target="_blank"
-                   class="inline-flex items-center gap-2 w-fit
-                          bg-blue-600 hover:bg-blue-700
-                          text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">
-                    📄 Download Bukti Pembayaran
-                </a>
-            @else
-                <p class="text-yellow-300 text-sm">
-                    ⚠️ Bukti pembayaran belum diunggah.
-                </p>
-            @endif
+        <div class="bg-white/5 p-4 rounded-xl border border-white/10 mb-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+            <div>
+                <p class="text-sm text-blue-200 font-medium">PO: <span class="text-white">{{ $po->nomor_po ?? '-' }}</span></p>
+                <p class="text-xs text-white/70 mt-1">Tanggal PO: {{ $po->tanggal_po ? \Carbon\Carbon::parse($po->tanggal_po)->translatedFormat('d M Y') : '-' }}</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:items-center md:gap-4">
+                @if ($pembayaran && $pembayaran->status === 'lunas')
+                    <span class="inline-block px-4 py-1 rounded-full text-xs font-semibold bg-green-400/20 text-green-300 mb-2 md:mb-0">
+                        ✅ Sudah Dibayar
+                    </span>
+                    <a href="{{ asset('storage/'.$pembayaran->bukti_bayar) }}" target="_blank"
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-white text-xs rounded-lg font-medium shadow transition">
+                        <i data-lucide="eye" class="w-4 h-4"></i> Lihat Bukti
+                    </a>
+                @elseif ($pembayaran && $pembayaran->status === 'pending')
+                    <span class="inline-block px-4 py-1 rounded-full text-xs font-semibold bg-yellow-400/20 text-yellow-300">
+                        ⏳ Dalam Proses Pembayaran
+                    </span>
+                @else
+                    <span class="inline-block px-4 py-1 rounded-full text-xs font-semibold bg-red-400/20 text-red-300">
+                        ❌ Belum Dibayar
+                    </span>
+                @endif
+            </div>
         </div>
-
-    @elseif ($kontrak->status_pembayaran === 'process')
-        {{-- ⏳ DALAM PROSES --}}
-        <span class="inline-block px-4 py-1 rounded-full text-sm font-semibold
-                     bg-yellow-400/20 text-yellow-300">
-            ⏳ Dalam Proses Pembayaran
-        </span>
-
-    @else
-        {{-- ❌ BELUM DIBAYAR --}}
-        <span class="inline-block px-4 py-1 rounded-full text-sm font-semibold
-                     bg-red-400/20 text-red-300">
-            ❌ Belum Dibayar
-        </span>
-
-        <p class="text-blue-200 text-sm mt-3">
-            Pembayaran akan diproses setelah seluruh dokumen dan kontrak selesai diverifikasi.
-        </p>
-    @endif
-
+    @empty
+        <p class="text-red-300 text-sm font-semibold">❌ Belum ada PO untuk kontrak ini.</p>
+    @endforelse
 </div>
+
+<script> lucide.createIcons(); </script>
+
 
 {{-- 🔘 Tombol Kembali (Floating) --}}
 <div class="fixed bottom-20 left-0 right-0 flex justify-center z-50">

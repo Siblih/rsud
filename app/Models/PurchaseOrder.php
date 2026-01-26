@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 
 class PurchaseOrder extends Model
 {
@@ -17,6 +19,11 @@ class PurchaseOrder extends Model
         'signed_by_vendor', 'signed_at', 'vendor_signature', 'vendor_signed_pdf'
 
     ];
+public function pembayaran(): HasOne
+    {
+        return $this->hasOne(Pembayaran::class, 'purchase_order_id');
+    }
+
 
     public function kontrak()
     {
