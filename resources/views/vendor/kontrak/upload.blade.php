@@ -58,8 +58,8 @@
                 <div class="flex items-center gap-2">
 
                     {{-- Tombol lihat --}}
-                    <a href="{{ asset('storage/'.$kontrak->$key) }}"
-                       target="_blank"
+                    <a href="{{ asset('storage/'.$kontrak->bast_signed) }}" target="_blank"
+
                        class="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 
                               px-3 py-1 rounded-lg text-xs font-medium transition">
                         <i data-lucide="eye" class="w-4 h-4"></i>

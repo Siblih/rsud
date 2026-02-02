@@ -13,7 +13,7 @@ use App\Models\Category;
 class VendorPengadaanController extends Controller
 {
     // 📦 Daftar pengadaan yang sudah disetujui
-    public function index()
+   public function index()
 {
     $pengadaans = Pengadaan::with([
         'penawarans' => function ($q) {
@@ -21,6 +21,17 @@ class VendorPengadaanController extends Controller
         }
     ])
     ->where('metode_pengadaan', 'kompetisi')
+
+    // 🔴 INI PENTING
+    ->whereDoesntHave('penawarans', function ($q) {
+        $q->where('status', 'menang');
+    })
+->withCount([
+    'penawarans as sudah_ada_pemenang' => function ($q) {
+        $q->where('status', 'menang');
+    }
+])
+
     ->latest()
     ->paginate(10);
 

@@ -17,7 +17,7 @@ class VendorDocumentController extends Controller
         $vendorProfile = VendorProfile::where('user_id', Auth::id())->first();
 
         if (!$vendorProfile) {
-            return redirect()->route('vendor.profile.create')
+            return redirect()->route('vendor.profile.edit')
                 ->with('error', 'Lengkapi profil vendor terlebih dahulu.');
         }
 

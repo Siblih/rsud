@@ -537,10 +537,12 @@
 
     {{-- 🔥 TOMBOL LIHAT BAST (WAJIB ADA) --}}
     @if ($kontrak)
-        <a href="{{ route('admin.bast.upload', $kontrak->id) }}"
+        <a href="{{ route('admin.bast.show', $kontrak->id) }}"
            class="block px-3 py-1 bg-blue-600/30 rounded text-xs hover:bg-blue-600/50">
             Lihat BAST
         </a>
+        
+
     @endif
 
     {{-- 🔥 STATUS PEMBAYARAN --}}
@@ -556,23 +558,29 @@
             Lihat Bukti
         </a>
     @else
-        {{-- ❌ BELUM UPLOAD --}}
-        <form action="{{ route('admin.pembayaran.upload', $po->id) }}"
-              method="POST"
-              enctype="multipart/form-data"
-              class="flex flex-col gap-1 mt-1">
-            @csrf
+       @if ($po)
+    <form action="{{ route('admin.pembayaran.upload', $po->id) }}"
+          method="POST"
+          enctype="multipart/form-data"
+          class="flex flex-col gap-1 mt-1">
+        @csrf
 
-            <input type="file"
-                   name="bukti_bayar"
-                   required
-                   class="text-xs text-white">
+        <input type="file"
+               name="bukti_bayar"
+               required
+               class="text-xs text-white">
 
-            <button type="submit"
-                    class="px-3 py-1 bg-green-600/30 rounded text-xs hover:bg-green-600/50">
-                Upload Bukti
-            </button>
-        </form>
+        <button type="submit"
+                class="px-3 py-1 bg-green-600/30 rounded text-xs hover:bg-green-600/50">
+            Upload Bukti
+        </button>
+    </form>
+@else
+    <span class="text-xs text-red-400 italic">
+        PO belum dibuat
+    </span>
+@endif
+
     @endif
 
 </td>

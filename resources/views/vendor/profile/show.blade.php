@@ -106,10 +106,10 @@
                 <div class="flex items-center gap-2">
                     
                     <span class="px-2 py-1 text-xs rounded-full
-                        @if($doc->status === 'verified') bg-green-400/20 text-green-300
-                        @elseif($doc->status === 'rejected') bg-red-400/20 text-red-300
-                        @else bg-yellow-400/20 text-yellow-300 @endif">
-                        {{ ucfirst($doc->status ?? 'pending') }}
+                        @if($profile->verification_status == 'verified') bg-green-400/20 text-green-300
+                @elseif($profile->verification_status == 'rejected') bg-red-400/20 text-red-300
+                @else bg-yellow-400/20 text-yellow-300 @endif">
+                {{ ucfirst($profile->verification_status ?? 'pending') }}
                     </span>
                 </div>
             </li>

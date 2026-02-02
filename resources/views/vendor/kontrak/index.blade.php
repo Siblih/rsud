@@ -18,6 +18,9 @@
               {{ ucfirst($kontrak->status ?? 'Proses') }}
           </span>
       </div>
+<div class="text-red-500 text-xs">
+    Kontrak ID: {{ $kontrak->id ?? 'TIDAK ADA' }}
+</div>
 
       {{-- 🔸 Detail Singkat --}}
       <p class="text-sm text-blue-200 mb-2">

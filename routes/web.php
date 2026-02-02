@@ -66,6 +66,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+
 // =======================
 // DASHBOARD BERDASARKAN ROLE
 // =======================

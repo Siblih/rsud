@@ -87,19 +87,16 @@ $pembayaranList = PurchaseOrder::with([
      * - Ambil dari:
      *   Pengadaan -> Penawaran (MENANG) -> Kontrak -> PO
      */
-    $bastList = Pengadaan::with([
-    'unit',
-    'penawarans' => fn ($q) =>
-        $q->where('status', 'menang')
-          ->with('vendor.vendorProfile'),
-    'kontraks.purchaseOrders.pembayaran' // tetap ambil relasi pembayaran
-])
-->where('metode_pengadaan', 'kompetisi')
-->whereHas('penawarans', fn ($q) =>
-    $q->where('status', 'menang')
-)
-->latest()
-->get();
+   $bastList = Pengadaan::with([
+        'unit',
+        'kontraks.vendor.vendorProfile',
+        'kontraks.purchaseOrders.pembayaran',
+        'penawarans.vendor.vendorProfile'
+    ])
+    ->whereHas('kontraks') // 🔥 KUNCI UTAMA
+    ->latest()
+    ->get();
+
 
 
     return view('admin.pengadaan.index', compact(

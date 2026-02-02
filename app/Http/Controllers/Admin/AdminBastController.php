@@ -17,50 +17,56 @@ class AdminBastController extends Controller
      * ❗ BUKAN HALAMAN SENDIRI
      * ❗ DIPAKAI OLEH ADMIN PENGADAAN TAB
      */
-    public function getBastList()
-    {
-        return Pengadaan::with([
-                'unit',
-                'penawarans' => function ($q) {
-                    $q->where('status', 'menang');
-                },
-                'penawarans.vendor.vendorProfile'
-            ])
-            ->where('metode_pengadaan', 'kompetisi')
-            ->whereHas('penawarans', function ($q) {
-                $q->where('status', 'menang');
-            })
-            ->latest()
-            ->get();
-    }
-public function show($id)
+   public function getBastList()
 {
-    $kontrak = Kontrak::with(['pengadaan'])->findOrFail($id);
-
-    $fields = [
-        'bast_file'          => 'Berita Acara Serah Terima (BAST)',
-        'invoice'            => 'Invoice',
-        'kwitansi'           => 'Kwitansi',
-        'faktur_pajak'       => 'Faktur Pajak',
-        'surat_jalan'        => 'Surat Jalan',
-    ];
-
-    return view('admin.bast.upload', compact(
-        'kontrak',
-        'fields'
-    ));
+    return Kontrak::with([
+        'pengadaan',
+        'vendor.vendorProfile'
+    ])
+    ->whereNotNull('bast_signed') // atau file lain
+    ->latest()
+    ->get();
 }
+
+public function show($id)
+    {
+        $kontrak = Kontrak::with([
+            'pengadaan',
+            'vendor.vendorProfile'
+        ])->findOrFail($id);
+
+        // ⬇️ FIELD HARUS SAMA DENGAN VENDOR
+        $fields = [
+            'po_signed'        => 'PO (Ditandatangani)',
+            'bast_signed'      => 'BAST (Ditandatangani)',
+            'invoice'          => 'Invoice',
+            'faktur_pajak'     => 'Faktur Pajak',
+            'surat_permohonan' => 'Surat Permohonan',
+        ];
+
+        return view('admin.bast.show', compact('kontrak', 'fields'));
+    }
+
 
 
     /**
      * 🔁 INDEX (JIKA DIAKSES LANGSUNG, REDIRECT KE TAB)
      */
-    public function index()
-    {
-        return redirect()->route('admin.pengadaan.index', [
-            'tab' => 'BAST'
-        ]);
-    }
+   // AdminBastController
+public function index()
+{
+    $kontraks = Kontrak::with(['pengadaan', 'vendor.vendorProfile'])
+        ->where(function ($q) {
+            $q->whereNotNull('bast_signed')
+              ->orWhereNotNull('invoice')
+              ->orWhereNotNull('po_signed');
+        })
+        ->latest()
+        ->get();
+
+    return view('admin.bast.index', compact('kontraks'));
+}
+
 
     /**
      * 🔍 SHOW BAST (HALAMAN DETAIL)
